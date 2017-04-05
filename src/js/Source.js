@@ -69,7 +69,7 @@ export default class Source {
       let src = srcArr[i];
       this.srcBuffer[src] = srcStrategy[type](src, () => {
         loadedLen++;
-        if(loadedLen == toLoadLen){
+        if(typeof callback == 'function' && loadedLen == toLoadLen){
           callback();
         }
       });

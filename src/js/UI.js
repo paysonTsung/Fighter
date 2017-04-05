@@ -24,7 +24,7 @@ export default class UI {
     }
   }
 
-  _setBtnText(lanSet){
+  setBtnText(lanSet){
     if(lanSet){
       lanSet = lanSet.toLowerCase();
     }
@@ -36,19 +36,19 @@ export default class UI {
     }
   }
 
-  _drawBackground(offsetY = 0){
+  drawBackground(offsetY = 0){
     this.ctx.drawImage(this.background, 0, offsetY);
   }
 
-  _drawLogo(){
+  drawLogo(){
     this.ctx.drawImage(this.logo, (this.canvas.width - this.logo.width)/2, 200);
   }
 
-  _drawImg(src, offsetX = 0, offsetY = 0){
+  drawImg(src, offsetX = 0, offsetY = 0){
     this.ctx.drawImage(this.globalSrcBuffer.getSrc(src, 'image'), offsetX, offsetY);
   }
 
-  _drawLoading(callback){
+  drawLoading(callback){
     let loadImgArr = config.loadImageSrc;
     let loadImgLen = loadImgArr.length;
     let index = 0;
@@ -56,7 +56,7 @@ export default class UI {
     let loadTimer = setInterval(() => {
       let loadSrc = this.globalSrcBuffer.getSrc(loadImgArr[index], 'image');
       let textWidth;
-      this._drawBackground();      
+      this.drawBackground();      
       this.ctx.fillStyle = 'black';
       this.ctx.font = '30px sans-serif';
       textWidth = this.ctx.measureText(loadText).width;      
@@ -77,10 +77,10 @@ export default class UI {
 
   _renderMainUI(){
     this.background.onload = () => {
-      this._drawBackground();
+      this.drawBackground();
       this.logo.onload = () => {
-        this._drawLogo();
-        this._setBtnText(this.language);
+        this.drawLogo();
+        this.setBtnText(this.language);
       }
     }
   }
@@ -106,15 +106,15 @@ export default class UI {
       lanSet.onchange = () => {
         this.language = lanChangeStrategy[lanSet.value];
         for(var i = 0, ui; ui = ['rank','set','rule'][i++];){
-          this._deleteUI(ui);
+          this.deleteUI(ui);
         }
-        this._setBtnText(this.language);
-        this._showUI('set', lanStrategy[this.language].setContent);
+        this.setBtnText(this.language);
+        this.showUI('set', lanStrategy[this.language].setContent);
       }
     }
   }
 
-  _createUI(name, content){
+  createUI(name, content){
     let tempDiv = $.create('div');
     tempDiv.className = name;
     tempDiv.style.zIndex = 100;
@@ -130,22 +130,22 @@ export default class UI {
     return tempDiv;
   }
   
-  _deleteUI(name){
+  deleteUI(name){
     if(this[name]){
       $.removeDOM(this[name]);
       delete this[name];
     }
   }
 
-  _showUI(name, content){
-    this._hideAllUI();
+  showUI(name, content){
+    this.hideAllUI();
     if(!this[name] || name == 'rank'){
-      this[name] = this._createUI(name, content);
+      this[name] = this.createUI(name, content);
     }
     this[name].style.display = 'block';
   }
 
-  _hideAllUI(){
+  hideAllUI(){
     for(let i = 0, ui; ui = ['start','rank','set','rule'][i++];){
       if(this[ui]){
         this[ui].style.display = 'none';

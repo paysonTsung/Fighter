@@ -11,7 +11,7 @@ let changeUIState = function(type, ui){
   let upperState = ui.toUpperCase();
   if(type == 'show'){
     return function(){
-      this._showUI(ui, lanStrategy[this.language][`${ui}Content`]);
+      this.showUI(ui, lanStrategy[this.language][`${ui}Content`]);
       this.curState = `${upperState}_UI`;
     }
   }else{
@@ -36,7 +36,6 @@ let hideRule = changeUIState('hide', 'rule');
 // }
 // let showSet = function(){
 //   this._showUI('set', lanStrategy[this.language].setContent);
-//   this._bindSetEvent();
 //   this.curState = 'SET_UI';
 // }
 // let showRule = function(){
@@ -59,7 +58,7 @@ let hideRule = changeUIState('hide', 'rule');
 let pauseGame = function(){
   this.controller.isPaused = true;
   if(!this.ctrl){
-    this.ctrl = this._createUI('ctrl', lanStrategy[this.language].ctrlContent);
+    this.ctrl = this.createUI('ctrl', lanStrategy[this.language].ctrlContent);
     let ctrlResume = getClass('ctrl-resume');
     let ctrlAgain = getClass('ctrl-again');
     ctrlResume.addEventListener('touchend', resumeGame.bind(this));
@@ -205,19 +204,19 @@ let gameRun = function(){
   let backScroll = () => {
     back.y1 = (back.y1 === height) ? -height : (back.y1 + 1);
     back.y2 = (back.y2 === height) ? -height : (back.y2 + 1);
-    this._drawBackground(back.y1);
-    this._drawBackground(back.y2);
+    this.drawBackground(back.y1);
+    this.drawBackground(back.y2);
   }
   let renderPlayer = () => {
     if(!player.dieFlag){
-      this._drawImg(`player${player.playerIndex}.png`, player.x, player.y);
+      this.drawImg(`player${player.playerIndex}.png`, player.x, player.y);
       if(frame.counter % 5 == 0){
         player.playerIndex = Number(!player.playerIndex);
       }
     }else{
       if(player.countDown == 0){
         this.curState = 'GAME_OVER_UI';
-        this._drawImg('game_over.png', 0, 0);
+        this.drawImg('game_over.png', 0, 0);
         this.bombBtn.style.display = 'none';
         this.ctrlBtn.style.display = 'none';
 
@@ -238,9 +237,9 @@ let gameRun = function(){
 
         let touchScreen = () => {
           this.globalSrcBuffer.soundPause('music.mp3');
-          this._drawBackground();
-          this._drawLogo();
-          this._setBtnText(this.language);
+          this.drawBackground();
+          this.drawLogo();
+          this.setBtnText(this.language);
           this.btnGroup.style.display = 'block';
           this.curState = 'MAIN_UI';
           canvas.removeEventListener('touchstart', touchScreen);
@@ -253,7 +252,7 @@ let gameRun = function(){
         return true;
       }else{
         let dieIndex = Math.floor(player.dieLen - player.countDown / 10);      
-        this._drawImg(`player_die${dieIndex}.png`, player.x, player.y);
+        this.drawImg(`player_die${dieIndex}.png`, player.x, player.y);
       }
       player.countDown--;
     }
@@ -280,7 +279,7 @@ let gameRun = function(){
         Bullet.recoverBullet(delBullet);
         continue;
       }
-      this._drawImg(`bullet_${bullet.type}.png`, bullet.x, bullet.y);
+      this.drawImg(`bullet_${bullet.type}.png`, bullet.x, bullet.y);
       bullet.y -= config.bulletSpeed;
       for(let j = enemyArr.length; j--;){
         let enemy = enemyArr[j];
@@ -336,15 +335,15 @@ let gameRun = function(){
           enemy.imgIndex = Number(!enemy.imgIndex);
         }
         if(enemy.blood < config.planeBlood.largePlane / 2 && enemy.imgIndex == 1){
-          this._drawImg('largePlane_hurt.png', enemy.x, enemy.y);
+          this.drawImg('largePlane_hurt.png', enemy.x, enemy.y);
         }else{
-          this._drawImg(`${type}${enemy.imgIndex}.png`, enemy.x, enemy.y);
+          this.drawImg(`${type}${enemy.imgIndex}.png`, enemy.x, enemy.y);
         }
       }else{
         if(type == 'mediumPlane' && enemy.blood < config.planeBlood.mediumPlane / 2){
-          this._drawImg('mediumPlane_hurt.png', enemy.x, enemy.y);
+          this.drawImg('mediumPlane_hurt.png', enemy.x, enemy.y);
         }
-        this._drawImg(`${type}.png`, enemy.x, enemy.y);    
+        this.drawImg(`${type}.png`, enemy.x, enemy.y);    
       }
       if(
         enemy.x + enemyWidth > player.x &&
@@ -369,7 +368,7 @@ let gameRun = function(){
         Enemy.recoverEnemy(delEnemy);
       }else{
         let dieIndex = Math.floor(diePlane.dieLen - diePlane.countDown / 10);      
-        this._drawImg(`${diePlane.type}_die${dieIndex}.png`, diePlane.x, diePlane.y);
+        this.drawImg(`${diePlane.type}_die${dieIndex}.png`, diePlane.x, diePlane.y);
       }
       diePlane.countDown--;
     }
@@ -387,7 +386,7 @@ let gameRun = function(){
   }
   let renderProps = () => {
     if(ctrler.curProp){
-      this._drawImg(`prop_${ctrler.curProp.type}.png`, ctrler.curProp.x, ctrler.curProp.y);
+      this.drawImg(`prop_${ctrler.curProp.type}.png`, ctrler.curProp.x, ctrler.curProp.y);
       ctrler.curProp.y += config.propSpeed;
       if(
         player.x < ctrler.curProp.x + propWidth &&
@@ -407,7 +406,7 @@ let gameRun = function(){
   }
   let renderBomb = () => {
     if(player.bomb){
-      this._drawImg('bomb.png', 10, height - bombHeight - 10);
+      this.drawImg('bomb.png', 10, height - bombHeight - 10);
       this.ctx.font = '30px sans-serif';
       this.ctx.fillText(`× ${player.bomb}`, bombWidth + 20, height - bombHeight / 2);
     }
@@ -420,9 +419,9 @@ let gameRun = function(){
   }
   let renderCtrl = () => {
     if(!ctrler.isPaused){
-      this._drawImg('game_pause.png', 0, 5);
+      this.drawImg('game_pause.png', 0, 5);
     }else{
-      this._drawImg('game_resume.png', 0, 5);
+      this.drawImg('game_resume.png', 0, 5);
     }
   }
 
@@ -448,12 +447,12 @@ let gameRun = function(){
 };
 
 let loadGame = function(){
-  this._drawBackground();
+  this.drawBackground();
   this.btnGroup.style.display = 'none';
-  this._hideAllUI();
+  this.hideAllUI();
   
   if(!this.loaded){
-    this._drawLoading(startGame.bind(this));
+    this.drawLoading(startGame.bind(this));
     this.globalSrcBuffer.preloadSrc(config.gameImageSrc, 'image', () => {
       console.log('image loaded');
       this.globalSrcBuffer.preloadSrc(config.gameAudioSrc, 'sound', () => {
