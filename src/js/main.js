@@ -1,4 +1,4 @@
-import '../css/main.css';
+// import '../css/main.css';
 import * as $ from './Utils';
 import {config} from './Config';
 import Source from './Source';
@@ -19,6 +19,7 @@ const ctrlBtn = $.getClass('ctrlBtn');
 
 const canvas = $.getID('game');
 const ctx = canvas.getContext('2d');
+
 const mainUI = new UI({
   wrapper,
   btnGroup,

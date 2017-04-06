@@ -13,10 +13,11 @@
     "babel-loader": "^6.2.10",
     "babel-preset-es2015": "^6.24.0",
     "css-loader": "^0.26.1",
+    "extract-text-webpack-plugin": "^2.1.0",
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
     "style-loader": "^0.13.1",
-    "webpack": "^1.14.0",
+    "webpack": "^2.3.3",
     "webpack-dev-server": "^1.16.2"
   }
 }

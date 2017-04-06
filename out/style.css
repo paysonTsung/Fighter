@@ -11,7 +11,7 @@ html,
 body {
   position: relative;
   width: 100%;
-  height: calc(100% - 2px);
+  height: 100%;
   background-color: black;
 }
 
@@ -47,8 +47,12 @@ body {
   border: 1px solid rgba(0,0,0,.7);
   border-radius: 10px 10px;
   margin-bottom: 5px;
+  /*transition: border-color .5s;*/
 }
 
+/*#btnGroup li:active {
+  border-color: black;
+}*/
 
 .bombBtn,
 .ctrlBtn {

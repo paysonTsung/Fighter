@@ -45,10 +45,10 @@ export let config = {
   },
   dieInterval: 10, // 玩家/敌机死亡动画间隔/帧
   propInterval: 300, // 道具发放间隔/帧
-  enemyInterval: 30, // 敌机出现初始间隔/帧
+  enemyInterval: 40, // 敌机出现初始间隔/帧
   bulletInterval: 8, // 子弹发射间隔/帧
-  promoteInterval: 100, //难度提升间隔/帧
-  promoteMin: 10, //难度提升最小间隔/帧
+  promoteInterval: 120, //难度提升间隔/帧
+  promoteMin: 20, //难度提升最小间隔/帧
   firepowerTime: 2e4, // 火力全开持续时间/ms
   backgroundImgSrc: 'background.jpg',
   logoSrc: 'logo.png',
