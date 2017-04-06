@@ -1540,6 +1540,8 @@ var ctrlBtn = $.getClass('ctrlBtn');
 var canvas = $.getID('game');
 var ctx = canvas.getContext('2d');
 
+btnGroup.style.display = 'block';
+
 var mainUI = new _UI2.default({
   wrapper: wrapper,
   btnGroup: btnGroup,

@@ -20,6 +20,8 @@ const ctrlBtn = $.getClass('ctrlBtn');
 const canvas = $.getID('game');
 const ctx = canvas.getContext('2d');
 
+btnGroup.style.display = 'block';
+
 const mainUI = new UI({
   wrapper,
   btnGroup,
