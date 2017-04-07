@@ -425,20 +425,21 @@ let loadGame = function(){ //加载游戏
   this.hideAllUI();
   
   if(!this.loaded){
-    let loadedSrc = 0;
+    // let loadedSrc = 0;
     this.drawLoading(startGame.bind(this));
-    this.globalSrcBuffer.preloadSrc(config.gameImageSrc, 'image', () => {
-      console.log('image loaded');
-      if(++loadedSrc == 2){
-        this.loaded = true;
-      }
-    });
-    this.globalSrcBuffer.preloadSrc(config.gameAudioSrc, 'sound', () => {
-      console.log('sound loaded');
-      if(++loadedSrc == 2){
-        this.loaded = true;
-      }
-    });
+    // this.globalSrcBuffer.preloadSrc(config.gameImageSrc, 'image', () => {
+    //   console.log('image loaded');
+    //   if(++loadedSrc == 2){
+    //     this.loaded = true;
+    //   }
+    // });
+    // this.globalSrcBuffer.preloadSrc(config.gameAudioSrc, 'sound', () => {
+    //   console.log('sound loaded');
+    //   if(++loadedSrc == 2){
+    //     this.loaded = true;
+    //   }
+    // });
+    this.loaded = true;
   }else{
     startGame.call(this);
   }

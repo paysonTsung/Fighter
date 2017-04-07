@@ -104,9 +104,9 @@ export default class UI {
       if(index === loadImgLen){
         console.log('loaded over');
         clearInterval(loadTimer);
-        setTimeout(callback, 300);
+        setTimeout(callback, 500);
       }
-    }, 250);
+    }, 300);
   }
 
   _renderMainUI(){ //渲染主界面
@@ -154,8 +154,8 @@ export default class UI {
   }
 
   _preloadGame(){
-    this.globalSrcBuffer.preloadSrc(config.gameImageSrc, 'image');
-    this.globalSrcBuffer.preloadSrc(config.gameAudioSrc, 'sound');
+    this.globalSrcBuffer.preloadSrc(config.gameImageSrc, 'image',() => {console.log('image loaded');});
+    this.globalSrcBuffer.preloadSrc(config.gameAudioSrc, 'sound',() => {console.log('sound loaded');});
   }
 
   _initCanvas(){ //初始化画布
