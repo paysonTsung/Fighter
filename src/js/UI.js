@@ -191,8 +191,16 @@ export default class UI {
       }
     }
   }
+
+  _preventDefault(){
+    window.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    });
+  }
   
   init(){ //UI初始化
+    this._preventDefault();
+
     this._initCanvas();
     this._preloadLoading();
     this._renderMainUI();
