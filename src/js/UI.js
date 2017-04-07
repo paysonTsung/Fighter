@@ -153,6 +153,11 @@ export default class UI {
     this.globalSrcBuffer.preloadSrc(config.loadImageSrc, 'image');
   }
 
+  _preloadGame(){
+    this.globalSrcBuffer.preloadSrc(config.gameImageSrc, 'image');
+    this.globalSrcBuffer.preloadSrc(config.gameAudioSrc, 'sound');
+  }
+
   _initCanvas(){ //初始化画布
     this.canvas.setAttribute('width', config.canvasWidth);
     this.canvas.setAttribute('height', config.canvasHeight);
@@ -205,6 +210,7 @@ export default class UI {
   
   init(){ //UI初始化
     this._preventDefault();
+    this._preloadGame();
 
     this._initCanvas();
     this._preloadLoading();
