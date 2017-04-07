@@ -92,7 +92,7 @@ export default class UI {
       this.drawBackground();           
       this.ctx.fillText(loadText, textPosX, 500);
       this.ctx.drawImage(loadSrc, 140, 400);   
-      index = (index === loadImgLen) ? loadIMgLen : index + 1;
+      index = (index === loadImgLen) ? loadImgLen : index + 1;
       if(index === loadImgLen && this.loaded){
         console.log('loaded over');
         clearInterval(loadTimer);
