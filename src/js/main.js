@@ -1,13 +1,12 @@
-// import '../css/main.css';
 import * as $ from './Utils';
 import {config} from './Config';
 import Source from './Source';
 import UI from './UI';
 
 const globalSrcBuffer = new Source();
-
 const background = globalSrcBuffer.getSrc(config.backgroundImgSrc, 'image');
 const logo = globalSrcBuffer.getSrc(config.logoSrc, 'image');
+
 const wrapper = $.getID('wrapper');
 const btnGroup = $.getID('btnGroup');
 const startBtn = $.getClass('startBtn');
@@ -19,8 +18,6 @@ const ctrlBtn = $.getClass('ctrlBtn');
 
 const canvas = $.getID('game');
 const ctx = canvas.getContext('2d');
-
-btnGroup.style.display = 'block';
 
 const mainUI = new UI({
   wrapper,
@@ -39,6 +36,4 @@ const mainUI = new UI({
   language: config.language
 })
 
-canvas.setAttribute('width', config.canvasWidth);
-canvas.setAttribute('height', config.canvasHeight);
 mainUI.init();

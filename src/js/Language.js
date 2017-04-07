@@ -1,4 +1,4 @@
-function getScoreArr(){
+function getScoreArr(){ //从本地客户端存储获取分数数据
   if(!sessionStorage.fighterScore){
     sessionStorage.fighterScore = '[]';
   }
@@ -11,7 +11,7 @@ function getScoreArr(){
   }
   return scores;
 }
-/******** 策略模式：语言环境策略对象 ********/
+/******** 语言环境策略对象 ********/
 export const lanStrategy = {
     chinese: {
       startBtn: '新的游戏',

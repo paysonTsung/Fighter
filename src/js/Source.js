@@ -22,17 +22,17 @@ let srcStrategy = {
 
 export default class Source {
   constructor(){
-    this.srcBuffer = {};
+    this.srcBuffer = {}; //资源缓存区
   }
   
-  getSrc(fileSrc, type){
+  getSrc(fileSrc, type){ //获取资源
     if(!this.srcBuffer[fileSrc]){
       this.srcBuffer[fileSrc] = srcStrategy[type](fileSrc);
     }
     return this.srcBuffer[fileSrc];
   }
 
-  soundPlay(src, config = {loop: false, replay: true}){
+  soundPlay(src, config = {loop: false, replay: true}){ //播放音乐/音效
     if(src == 'music.mp3'){
       console.log('play');
     }
@@ -53,7 +53,7 @@ export default class Source {
     return sound;
   }
 
-  soundPause(src){ 
+  soundPause(src){ //暂停音乐
     if(src == 'music.mp3'){
       console.log('pause');
     }
@@ -62,7 +62,7 @@ export default class Source {
     return sound;
   }
 
-  preloadSrc(srcArr, type, callback){
+  preloadSrc(srcArr, type, callback){ //资源预加载
     let toLoadLen = srcArr.length;
     let loadedLen = 0;
     for(let i = toLoadLen; i--;){

@@ -3,6 +3,7 @@ import * as $ from './Utils';
 import {lanStrategy} from './Language';
 import {FSM} from './FSM';
 
+/*** 语言转换策略 ***/
 let lanChangeStrategy = {
   '中文': 'chinese',
   'English': 'english'
@@ -10,21 +11,21 @@ let lanChangeStrategy = {
 
 export default class UI {
   constructor(paramObj){
-    paramObj.curState = 'MAIN_UI';
-    paramObj.controller = null;
-    paramObj.score = null;
-    paramObj.loaded = false;
+    this.curState = 'MAIN_UI'; //状态
+    this.controller = null; //游戏控制器
+    this.score = null; //分数
+    this.loaded = false; //加载状态
     Object.assign(this, paramObj);
   }
 
-  static getRatio(){
+  static getRatio(){ //获取画布与实际屏幕缩放比
     return {
       x: $.getStyle($.getID('wrapper'),'width').slice(0, -2) / config.canvasWidth,
       y: $.getStyle($.getID('wrapper'),'height').slice(0, -2) / config.canvasHeight
     }
   }
 
-  setBtnText(lanSet){
+  setBtnText(lanSet){ //设置按钮文本信息
     if(lanSet){
       lanSet = lanSet.toLowerCase();
     }
@@ -36,19 +37,47 @@ export default class UI {
     }
   }
 
-  drawBackground(offsetY = 0){
+  drawBackground(offsetY = 0){ //绘制背景
     this.ctx.drawImage(this.background, 0, offsetY);
   }
 
-  drawLogo(){
+  drawLogo(){ //绘制Logo
     this.ctx.drawImage(this.logo, (this.canvas.width - this.logo.width)/2, 200);
   }
 
-  drawImg(src, offsetX = 0, offsetY = 0){
+  drawImg(src, offsetX = 0, offsetY = 0){ //绘制图片
     this.ctx.drawImage(this.globalSrcBuffer.getSrc(src, 'image'), offsetX, offsetY);
   }
 
-  drawLoading(callback){
+  // drawLoading(callback){
+  //   let loadImgArr = config.loadImageSrc;
+  //   let loadImgLen = loadImgArr.length;
+  //   let index = 0;
+  //   let loadText = lanStrategy[this.language].loading;
+  //   let loadTimer = setInterval(() => {
+  //     let loadSrc = this.globalSrcBuffer.getSrc(loadImgArr[index], 'image');
+  //     let textWidth;
+  //     this.drawBackground();      
+  //     this.ctx.fillStyle = 'black';
+  //     this.ctx.font = '30px sans-serif';
+  //     textWidth = this.ctx.measureText(loadText).width;      
+  //     this.ctx.fillText(loadText, (config.canvasWidth - textWidth) / 2, 500);
+  //     if(!loadSrc.onload){
+  //       loadSrc.onload = () => {
+  //         this.ctx.drawImage(loadSrc, 140, 400);   
+  //         index++;
+  //         if(index === loadImgLen){
+  //           console.log('loaded over');
+  //           clearInterval(loadTimer);
+  //           setTimeout(callback, 300);
+  //         }
+  //       }
+  //     }
+  //   }, 250);
+  // }
+
+  drawLoading(callback){ //绘制加载动画
+    // console.log(this.globalSrcBuffer.srcBuffer);
     let loadImgArr = config.loadImageSrc;
     let loadImgLen = loadImgArr.length;
     let index = 0;
@@ -61,31 +90,28 @@ export default class UI {
       this.ctx.font = '30px sans-serif';
       textWidth = this.ctx.measureText(loadText).width;      
       this.ctx.fillText(loadText, (config.canvasWidth - textWidth) / 2, 500);
-      if(!loadSrc.onload){
-        loadSrc.onload = () => {
-          this.ctx.drawImage(loadSrc, 140, 400);   
-          index++;
-          if(index === loadImgLen){
-            console.log('loaded over');
-            clearInterval(loadTimer);
-            setTimeout(callback, 300);
-          }
-        }
+      this.ctx.drawImage(loadSrc, 140, 400);   
+      index++;
+      if(index === loadImgLen){
+        console.log('loaded over');
+        clearInterval(loadTimer);
+        setTimeout(callback, 300);
       }
     }, 250);
   }
 
-  _renderMainUI(){
+  _renderMainUI(){ //渲染主界面
     this.background.onload = () => {
       this.drawBackground();
       this.logo.onload = () => {
         this.drawLogo();
+        this.btnGroup.style.display = 'block';
         this.setBtnText(this.language);
       }
     }
   }
 
-  _bindBtnEvent(){
+  _bindBtnEvent(){ //绑定按钮事件
     for(let i = 0, btn; btn = ['startBtn','rankBtn','setBtn','ruleBtn'][i++];){
       this[btn].addEventListener('touchend', () => {
         FSM[this.curState][`click${$.firstUpper(btn)}`].call(this);
@@ -93,14 +119,14 @@ export default class UI {
     }
   }
 
-  bindCtrlEvent(){
+  bindCtrlEvent(){ //绑定暂停控制事件
     this.ctrlBtn.addEventListener('touchend', () => {
       this.globalSrcBuffer.soundPlay('button.mp3');
       FSM[this.curState].clickCtrlBtn.call(this);
     })
   }
 
-  _bindSetEvent(){
+  _bindSetEvent(){ //绑定设置相关事件
     const lanSet = $.getClass('lanSet');
     if(!lanSet.onchange){
       lanSet.onchange = () => {
@@ -114,7 +140,16 @@ export default class UI {
     }
   }
 
-  createUI(name, content){
+  _preloadLoading(){ //预加载loding图片
+    this.globalSrcBuffer.preloadSrc(config.loadImageSrc, 'image');
+  }
+
+  _initCanvas(){ //初始化画布
+    this.canvas.setAttribute('width', config.canvasWidth);
+    this.canvas.setAttribute('height', config.canvasHeight);
+  }
+
+  createUI(name, content){ //创建UI
     let tempDiv = $.create('div');
     tempDiv.className = name;
     tempDiv.style.zIndex = 100;
@@ -130,14 +165,14 @@ export default class UI {
     return tempDiv;
   }
   
-  deleteUI(name){
+  deleteUI(name){ //删除UI
     if(this[name]){
       $.removeDOM(this[name]);
       delete this[name];
     }
   }
 
-  showUI(name, content){
+  showUI(name, content){ //显示子界面
     this.hideAllUI();
     if(!this[name] || name == 'rank'){
       this[name] = this.createUI(name, content);
@@ -145,7 +180,7 @@ export default class UI {
     this[name].style.display = 'block';
   }
 
-  hideAllUI(){
+  hideAllUI(){ //隐藏全部子界面层
     for(let i = 0, ui; ui = ['start','rank','set','rule'][i++];){
       if(this[ui]){
         this[ui].style.display = 'none';
@@ -153,7 +188,9 @@ export default class UI {
     }
   }
   
-  init(){
+  init(){ //UI初始化
+    this._initCanvas();
+    this._preloadLoading();
     this._renderMainUI();
     this._bindBtnEvent();
   }

@@ -24,7 +24,7 @@ var getStyle = function(ele, style){
 		return ele.currentStyle[style];
 	}
 };
-var createObjPool = function(createObjFn){
+var createObjPool = function(createObjFn){ //对象池工厂
   var objPool = [];
   return {
     get: function(){

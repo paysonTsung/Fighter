@@ -8,15 +8,15 @@ export default class Player extends Plane {
     this.height = config.playerHeight;
     this.x = (config.canvasWidth - this.width)/2;
     this.y = config.canvasHeight - this.height - 100;
-    this.playerIndex = 0;
-    this.bomb = 0;
-    this.score = 0;
-    this.isFullFirepower = false;
-    this.isInvincible = false;
-    this.dieFlag = false;
-    this.dieLen = config.dieImgNum.player;
+    this.playerIndex = 0; //图片显示index
+    this.bomb = 0; //炸弹数量
+    this.score = 0; //分数
+    this.isFullFirepower = false; //火力全开状态
+    this.isInvincible = false; //无敌状态
+    this.dieFlag = false; //死亡flag
+    this.dieLen = config.dieImgNum.player; //死亡图片数
   }
-  bindTouchEvent(dom){
+  bindTouchEvent(dom){ //绑定移动事件
     let planeBoundaryMinX = 0;
     let planeBoundaryMaxX = config.canvasWidth -  config.playerWidth;
     let planeBoundaryMinY = 0;
@@ -51,7 +51,7 @@ export default class Player extends Plane {
       });
     });
   }
-  bindBombEvent(dom, srcBuffer, enemyArr, dieArr){
+  bindBombEvent(dom, srcBuffer, enemyArr, dieArr){ //绑定爆炸事件
     dom.addEventListener('touchend', (e) => {
       if(this.bomb){
         this.bomb--;

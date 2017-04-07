@@ -30,32 +30,7 @@ let hideSet = changeUIState('hide', 'set');
 let hideRule = changeUIState('hide', 'rule');
 
 
-// let showRank = function(){
-//   this._showUI('rank', lanStrategy[this.language].rankContent);
-//   this.curState = 'RANK_UI';
-// }
-// let showSet = function(){
-//   this._showUI('set', lanStrategy[this.language].setContent);
-//   this.curState = 'SET_UI';
-// }
-// let showRule = function(){
-//   this._showUI('rule', lanStrategy[this.language].ruleContent);
-//   this.curState = 'RULE_UI';
-// }
-// let hideRank = function(){
-//   this.rank.style.display = 'none';
-//   this.curState = 'MAIN_UI';
-// }
-// let hideSet = function(){
-//   this.set.style.display = 'none';
-//   this.curState = 'MAIN_UI';
-// }
-// let hideRule = function(){
-//   this.rule.style.display = 'none';
-//   this.curState = 'MAIN_UI';
-// }
-
-let pauseGame = function(){
+let pauseGame = function(){ //暂停游戏
   this.controller.isPaused = true;
   if(!this.ctrl){
     this.ctrl = this.createUI('ctrl', lanStrategy[this.language].ctrlContent);
@@ -68,14 +43,14 @@ let pauseGame = function(){
   this.ctrl.style.display = 'block';
   this.curState = 'GAME_PAUSE_UI';
 }
-let resumeGame = function(){
+let resumeGame = function(){ //继续游戏
   this.controller.isPaused = false;
   this.ctrl.style.display = 'none';
   this.curState = 'IN_GAME_UI';
   this.globalSrcBuffer.soundPlay('music.mp3', {loop:true, replay:false});
   gameRun.call(this);
 }
-let againGame = function(){
+let againGame = function(){ //重新游戏
   this.controller = null;
   this.ctrl.style.display = 'none';
   this.curState = 'IN_GAME_UI';
@@ -83,9 +58,7 @@ let againGame = function(){
   startGame.call(this);
 }
 
-
-
-let randomPlane = function(){
+let randomPlane = function(){ //随机敌机
   let index = Math.random();
   if(index < 0.7){
     return 'smallPlane';
@@ -98,7 +71,7 @@ let randomPlane = function(){
   }
 }
 
-let randomProp = function(){
+let randomProp = function(){ //随机道具
   let index = Math.random();
   if(index < 0.5){
     return 'bomb';
@@ -108,7 +81,7 @@ let randomProp = function(){
   }
 }
 
-let propStrategy = {
+let propStrategy = { //道具策略
   bomb: function(player){
     let bombNum = player.bomb;
     if(bombNum < config.bombMax){
@@ -143,7 +116,7 @@ let {
 } = config;
 
 
-let startGame = function(){
+let startGame = function(){ //启动游戏
   console.log('game start');
 
   //背景音乐
@@ -177,7 +150,7 @@ let startGame = function(){
 
 }
 
-let gameRun = function(){
+let gameRun = function(){ //运行游戏真动画
   let canvas = this.canvas;
   let {width, height} = canvas;
   
@@ -433,7 +406,7 @@ let gameRun = function(){
   renderEnemy(); //渲染敌机
   renderDieEnemy(); //渲染爆炸敌机
   if(renderPlayer()){ //渲染玩家飞机
-    return;
+    return;//终止
   }
   sendProps(); //发放道具
   renderProps(); //渲染道具
@@ -446,7 +419,7 @@ let gameRun = function(){
   }
 };
 
-let loadGame = function(){
+let loadGame = function(){ //加载游戏
   this.drawBackground();
   this.btnGroup.style.display = 'none';
   this.hideAllUI();
@@ -465,13 +438,13 @@ let loadGame = function(){
   }
 }
 
-/******** 状态模式：UI-有限状态机 ********/
+/******** UI-有限状态机 ********/
 export const FSM = {
     'MAIN_UI': {
       clickStartBtn: loadGame,
-      clickRankBtn: showRank, //changeUIState.bind(ui, 'show', 'rank');
-      clickSetBtn: showSet, //changeUIState.bind(ui, 'show', 'set');
-      clickRuleBtn: showRule //changeUIState.bind(ui, 'show', 'rule');
+      clickRankBtn: showRank,
+      clickSetBtn: showSet,
+      clickRuleBtn: showRule
     },
     'RANK_UI': {
       clickStartBtn: loadGame,
