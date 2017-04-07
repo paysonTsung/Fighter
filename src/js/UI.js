@@ -211,7 +211,6 @@ export default class UI {
   init(){ //UI初始化
     this._preventDefault();
     this._preloadGame();
-
     this._initCanvas();
     this._preloadLoading();
     this._renderMainUI();

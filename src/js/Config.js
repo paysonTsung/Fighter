@@ -93,18 +93,18 @@ export let config = {
     'game_over.png'
   ],
   gameAudioSrc: [
+    'music.mp3',
+    'biubiubiu.mp3',
+    'button.mp3',
     'smallPlane_die.mp3',
     'mediumPlane_die.mp3',
     'largePlane_die.mp3',
-    'biubiubiu.mp3',
     'player_bomb.mp3',
     'get_bomb_prop.mp3',
     'get_weapon_prop.mp3',
-    'music.mp3',
     'prop_appear.mp3',
     'use_bomb.mp3',
     'largePlane_flying.mp3',
-    'button.mp3',
     'achievement.mp3'
   ]
 }
