@@ -82,17 +82,18 @@ export default class UI {
     let loadImgLen = loadImgArr.length;
     let index = 0;
     let loadText = lanStrategy[this.language].loading;
+    this.ctx.fillStyle = 'black';
+    this.ctx.font = '30px sans-serif';
+    let textWidth = this.ctx.measureText(loadText).width; 
+    let textPosX = (config.canvasWidth - textWidth) / 2;
+
     let loadTimer = setInterval(() => {
       let loadSrc = this.globalSrcBuffer.getSrc(loadImgArr[index], 'image');
-      let textWidth;
-      this.drawBackground();      
-      this.ctx.fillStyle = 'black';
-      this.ctx.font = '30px sans-serif';
-      textWidth = this.ctx.measureText(loadText).width;      
-      this.ctx.fillText(loadText, (config.canvasWidth - textWidth) / 2, 500);
+      this.drawBackground();           
+      this.ctx.fillText(loadText, textPosX, 500);
       this.ctx.drawImage(loadSrc, 140, 400);   
-      index++;
-      if(index === loadImgLen){
+      index = (index === loadImgLen) ? loadIMgLen : index + 1;
+      if(index === loadImgLen && this.loaded){
         console.log('loaded over');
         clearInterval(loadTimer);
         setTimeout(callback, 300);
