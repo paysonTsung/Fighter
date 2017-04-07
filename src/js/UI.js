@@ -92,11 +92,16 @@ export default class UI {
         index--;
       }
       let loadSrc = this.globalSrcBuffer.getSrc(loadImgArr[index], 'image');
-      this.drawBackground();           
+      this.drawBackground();    
       this.ctx.fillText(loadText, textPosX, 500);
       this.ctx.drawImage(loadSrc, 140, 400);   
       index++;
-      if(index === loadImgLen && this.loaded){
+      // if(index === loadImgLen && this.loaded){
+      //   console.log('loaded over');
+      //   clearInterval(loadTimer);
+      //   setTimeout(callback, 300);
+      // }
+      if(index === loadImgLen){
         console.log('loaded over');
         clearInterval(loadTimer);
         setTimeout(callback, 300);
