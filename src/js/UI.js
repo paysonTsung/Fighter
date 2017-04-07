@@ -88,11 +88,14 @@ export default class UI {
     let textPosX = (config.canvasWidth - textWidth) / 2;
 
     let loadTimer = setInterval(() => {
+      if(index > loadImgLen - 1){
+        index--;
+      }
       let loadSrc = this.globalSrcBuffer.getSrc(loadImgArr[index], 'image');
       this.drawBackground();           
       this.ctx.fillText(loadText, textPosX, 500);
       this.ctx.drawImage(loadSrc, 140, 400);   
-      index = (index === loadImgLen) ? index : index + 1;
+      index++;
       if(index === loadImgLen && this.loaded){
         console.log('loaded over');
         clearInterval(loadTimer);
