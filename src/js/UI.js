@@ -203,9 +203,11 @@ export default class UI {
   }
 
   _preventDefault(){
-    window.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-    });
+    if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+      window.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+      });  
+    }
   }
   
   init(){ //UI初始化
