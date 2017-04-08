@@ -64,8 +64,7 @@ export default class Player extends Plane {
           dieArr.push(dieEnemy);
           this.score += config.score[dieEnemy.type];
           srcBuffer.soundPlay('use_bomb.mp3');
-        }
-        
+        }   
       }
     });
   }

@@ -194,11 +194,15 @@ export default class UI {
     this[name].style.display = 'block';
   }
 
+  hideUI(name){ //隐藏子界面
+    if(this[name]){
+      this[name].style.display = 'none';
+    }
+  }
+
   hideAllUI(){ //隐藏全部子界面层
     for(let i = 0, ui; ui = ['start','rank','set','rule'][i++];){
-      if(this[ui]){
-        this[ui].style.display = 'none';
-      }
+      this.hideUI(ui);
     }
   }
 
@@ -206,7 +210,7 @@ export default class UI {
     if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
       window.addEventListener('touchmove', (e) => {
         e.preventDefault();
-      });  
+      });
     }
   }
   

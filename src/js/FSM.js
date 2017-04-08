@@ -8,17 +8,21 @@ import Prop from './Prop';
 
 
 let changeUIState = function(type, ui){
+  function show(){
+    this.showUI(ui, lanStrategy[this.language][`${ui}Content`]);
+  }
+  function hide(){
+    this.hideUI(ui);
+  }
   let upperState = ui.toUpperCase();
   if(type == 'show'){
-    return function(){
-      this.showUI(ui, lanStrategy[this.language][`${ui}Content`]);
+    return show.after(function(){
       this.curState = `${upperState}_UI`;
-    }
+    });
   }else{
-    return function(){
-      this[ui].style.display = 'none';
+    return hide.after(function(){
       this.curState = 'MAIN_UI';
-    }
+    });
   }
 };
 
@@ -30,7 +34,7 @@ let hideSet = changeUIState('hide', 'set');
 let hideRule = changeUIState('hide', 'rule');
 
 
-let pauseGame = function(){ //暂停游戏
+let pause = function(){ //暂停游戏
   this.controller.isPaused = true;
   if(!this.ctrl){
     this.ctrl = this.createUI('ctrl', lanStrategy[this.language].ctrlContent);
@@ -43,20 +47,31 @@ let pauseGame = function(){ //暂停游戏
   this.ctrl.style.display = 'block';
   this.curState = 'GAME_PAUSE_UI';
 }
-let resumeGame = function(){ //继续游戏
+let resume = function(){ //继续游戏
   this.controller.isPaused = false;
   this.ctrl.style.display = 'none';
   this.curState = 'IN_GAME_UI';
   this.globalSrcBuffer.soundPlay('music.mp3', {loop:true, replay:false});
   gameRun.call(this);
 }
-let againGame = function(){ //重新游戏
+let again = function(){ //重新游戏
   this.controller = null;
   this.ctrl.style.display = 'none';
   this.curState = 'IN_GAME_UI';
   this.globalSrcBuffer.soundPlay('music.mp3', {loop:true, replay:true});
   startGame.call(this);
 }
+
+let pauseGame = pause.after(function(){
+  this.curState = 'GAME_PAUSE_UI';
+});
+let resumeGame = resume.before(function(){
+  this.curState = 'IN_GAME_UI';
+});
+let againGame = again.before(function(){
+  this.curState = 'IN_GAME_UI';
+});
+
 
 let randomPlane = function(){ //随机敌机
   let index = Math.random();
