@@ -12,6 +12,7 @@ export default class Player extends Plane {
     this.bomb = 0; //炸弹数量
     this.score = 0; //分数
     this.isFullFirepower = false; //火力全开状态
+    this.weaponLevel = 0; //武器等级
     this.isInvincible = false; //无敌状态
     this.dieFlag = false; //死亡flag
     this.dieLen = config.dieImgNum.player; //死亡图片数

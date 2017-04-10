@@ -45,8 +45,8 @@ export const lanStrategy = {
         击毁敌机<br>\
         获取积分<br>\
         小型飞机： 100分<br>\
-        中型飞机： 500分<br>\
-        大型飞机： 1000分',
+        中型飞机： 1200分<br>\
+        大型飞机： 3500分',
       loading: 
         '游戏加载中, 请稍候...',
       score:
@@ -87,8 +87,8 @@ export const lanStrategy = {
         killing the enemies<br>\
         getting score<br>\
         Small Fighter: 100 points<br>\
-        Medium Fighter: 500 points<br>\
-        Large Fighter: 1000 points',
+        Medium Fighter: 1200 points<br>\
+        Large Fighter: 3500 points',
       loading: 
         'Game loading ......',
       score:

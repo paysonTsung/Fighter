@@ -104,6 +104,10 @@ let propStrategy = { //道具策略
     }
   },
   weapon: function(player){
+    let {weaponLevel} = player;
+    if(weaponLevel < 3){
+      player.weaponLevel = weaponLevel + 1;
+    }
     if(!player.isFullFirepower){
       player.isFullFirepower = true;
     }else{
@@ -111,6 +115,7 @@ let propStrategy = { //道具策略
     }
     player.firepowerTimer = setTimeout(function(){
       player.isFullFirepower = false;
+      player.weaponLevel = 0;
     }, config.firepowerTime);
   }
 }
@@ -132,7 +137,7 @@ let {
 
 
 let startGame = function(){ //启动游戏
-  console.log('game start');
+  // console.log('game start');
 
   //背景音乐
   this.globalSrcBuffer.soundPlay('music.mp3', {loop:true, replay:true});
@@ -246,16 +251,50 @@ let gameRun = function(){ //运行游戏真动画
     }
   }
   let sendBullet = () => {
+    let {bulletSpeed} = config;
     if(frame.counter % bulletInterval == 0){
-      if(!player.isFullFirepower){
-        let newBullet = Bullet.getBullet(player.x + player.width/2 - 3, player.y, 'normal');
-        bulletArr.push(newBullet);
-      }else{
-        let newLeftBullet = Bullet.getBullet(player.x + player.width/2 - 20, player.y, 'strength');
-        let newRightBullet = Bullet.getBullet(player.x + player.width/2 + 14, player.y, 'strength');
-        bulletArr.push(newLeftBullet);
-        bulletArr.push(newRightBullet);
+      switch(player.weaponLevel){
+        case 0:
+          {
+            let newBullet = Bullet.getBullet(player.x + player.width/2 - 3, player.y, 0, -bulletSpeed, 'normal', 1);
+            bulletArr.push(newBullet);
+            break;
+          }
+        case 1:
+          {
+            let newLeftBullet = Bullet.getBullet(player.x + player.width/2 - 20, player.y, 0, -bulletSpeed,  'normal', 1);
+            let newRightBullet = Bullet.getBullet(player.x + player.width/2 + 14, player.y, 0, -bulletSpeed,  'normal', 1);
+            bulletArr.push(newLeftBullet, newRightBullet);
+            break;
+          }
+        case 2:
+          {
+            let newLeftBullet = Bullet.getBullet(player.x + player.width/2 - 38, player.y + 20, -bulletSpeed/3, -bulletSpeed,  'strength', 1);
+            let newMidBullet = Bullet.getBullet(player.x + player.width/2 - 3, player.y, 0, -bulletSpeed,  'normal', 1);
+            let newRightBullet = Bullet.getBullet(player.x + player.width/2 + 30, player.y + 20, bulletSpeed/3, -bulletSpeed,  'strength', 1);
+            bulletArr.push(newLeftBullet, newMidBullet, newRightBullet);
+            break;
+          }
+        case 3:
+          {
+            let newLeftBullet = Bullet.getBullet(player.x + player.width/2 - 38, player.y + 20, -bulletSpeed/3, -bulletSpeed,  'strength', 1);
+            let newMidLeftBullet = Bullet.getBullet(player.x + player.width/2 - 20, player.y, 0, -bulletSpeed,  'normal', 1);
+            let newMidRightBullet = Bullet.getBullet(player.x + player.width/2 + 14, player.y, 0, -bulletSpeed,  'normal', 1);
+            let newRightBullet = Bullet.getBullet(player.x + player.width/2 + 30, player.y + 20, bulletSpeed/3, -bulletSpeed,  'strength', 1);
+            bulletArr.push(newLeftBullet, newMidLeftBullet, newMidRightBullet, newRightBullet);
+          }
+        default:
+          break;
       }
+      // if(!player.isFullFirepower){
+      //   let newBullet = Bullet.getBullet(player.x + player.width/2 - 3, player.y, 'normal');
+      //   bulletArr.push(newBullet);
+      // }else{
+      //   let newLeftBullet = Bullet.getBullet(player.x + player.width/2 - 20, player.y, 'strength');
+      //   let newRightBullet = Bullet.getBullet(player.x + player.width/2 + 14, player.y, 'strength');
+      //   bulletArr.push(newLeftBullet);
+      //   bulletArr.push(newRightBullet);
+      // }
       this.globalSrcBuffer.soundPlay('biubiubiu.mp3');
     }
   }
@@ -268,7 +307,10 @@ let gameRun = function(){ //运行游戏真动画
         continue;
       }
       this.drawImg(`bullet_${bullet.type}.png`, bullet.x, bullet.y);
-      bullet.y -= config.bulletSpeed;
+      bullet.y += bullet.shiftY;
+      if(bullet.shiftX){
+        bullet.x += bullet.shiftX;
+      }
       for(let j = enemyArr.length; j--;){
         let enemy = enemyArr[j];
         if(bullet.x + config.bulletWidth > enemy.x &&
@@ -278,7 +320,8 @@ let gameRun = function(){ //运行游戏真动画
         ){
           let delBullet = bulletArr.splice(i, 1)[0];
           Bullet.recoverBullet(delBullet);
-          if(--enemy.blood == 0){
+          enemy.blood -= delBullet.damage;
+          if(enemy.blood <= 0){
             let dieEnemy = enemyArr.splice(j, 1)[0];
             let dieLen = config.dieImgNum[dieEnemy.type];
             dieEnemy.dieLen = dieLen;

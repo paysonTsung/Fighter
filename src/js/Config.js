@@ -29,8 +29,8 @@ export let config = {
   buttonHeight: 45,
   planeBlood: {
     smallPlane: 1,
-    mediumPlane: 8,
-    largePlane: 16
+    mediumPlane: 12,
+    largePlane: 30
   },
   dieImgNum: {
     player: 4,
@@ -40,11 +40,11 @@ export let config = {
   },
   score: {
     smallPlane: 100,
-    mediumPlane: 800,
-    largePlane: 2000
+    mediumPlane: 1200,
+    largePlane: 3500
   },
   dieInterval: 10, // 玩家/敌机死亡动画间隔/帧
-  propInterval: 300, // 道具发放间隔/帧
+  propInterval: 500, // 道具发放间隔/帧
   enemyInterval: 40, // 敌机出现初始间隔/帧
   bulletInterval: 8, // 子弹发射间隔/帧
   promoteInterval: 120, //难度提升间隔/帧
