@@ -101,10 +101,10 @@ let randomAI = function(){ //随机智能机群
 
 let randomProp = function(){ //随机道具
   let index = Math.random();
-  if(index < 0.4){
+  if(index < 0.3){
     return 'bomb';
   }
-  if(index >= 0.4){
+  if(index >= 0.3){
     return 'weapon';
   }
 }
@@ -118,7 +118,7 @@ let propStrategy = { //道具策略
   },
   weapon: function(player){
     let {weaponLevel} = player;
-    if(weaponLevel < 3){
+    if(weaponLevel < 4){
       player.weaponLevel = weaponLevel + 1;
     }
     if(!player.isFullFirepower){
@@ -295,6 +295,17 @@ let gameRun = function(){ //运行游戏真动画
             let newMidRightBullet = Bullet.getBullet(player.x + player.width/2 + 14, player.y, 0, -bulletSpeed,  'normal', 1);
             let newRightBullet = Bullet.getBullet(player.x + player.width/2 + 30, player.y + 20, bulletSpeed/3, -bulletSpeed,  'strength', 1);
             bulletArr.push(newLeftBullet, newMidLeftBullet, newMidRightBullet, newRightBullet);
+            break;
+          }
+        case 4:
+          {
+            let newLeftBullet = Bullet.getBullet(player.x + player.width/2 - 38, player.y + 20, -bulletSpeed/3, -bulletSpeed,  'strength', 1);
+            let newMidLeftBullet = Bullet.getBullet(player.x + player.width/2 - 20, player.y, -bulletSpeed/4, -bulletSpeed,  'normal', 1);
+            let newMidBullet = Bullet.getBullet(player.x + player.width/2 - 3, player.y, 0, -bulletSpeed,  'super', 2);
+            let newMidRightBullet = Bullet.getBullet(player.x + player.width/2 + 14, player.y, bulletSpeed/4, -bulletSpeed,  'normal', 1);
+            let newRightBullet = Bullet.getBullet(player.x + player.width/2 + 30, player.y + 20, bulletSpeed/3, -bulletSpeed,  'strength', 1);
+            bulletArr.push(newLeftBullet, newMidLeftBullet, newMidBullet, newMidRightBullet, newRightBullet);
+            break;
           }
         default:
           break;

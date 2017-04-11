@@ -67,6 +67,7 @@ export let config = {
     'player_die3.png',
     'bullet_normal.png',
     'bullet_strength.png',
+    'bullet_super.png',
     'bomb.png',
     'prop_bomb.png',
     'prop_weapon.png',
