@@ -3,6 +3,10 @@ import * as $ from './Utils';
 import {lanStrategy} from './Language';
 import {FSM} from './FSM';
 
+
+/*** 版本 ***/
+let version = '1.25';
+
 /*** 语言转换策略 ***/
 let lanChangeStrategy = {
   '中文': 'chinese',
@@ -43,6 +47,9 @@ export default class UI {
 
   drawLogo(){ //绘制Logo
     this.ctx.drawImage(this.logo, (this.canvas.width - this.logo.width)/2, 200);
+    this.ctx.fillStyle = 'black';
+    this.ctx.font = 'bold 30px sans-serif';
+    this.ctx.fillText(version, 320, 220 + this.logo.height);
   }
 
   drawImg(src, offsetX = 0, offsetY = 0){ //绘制图片

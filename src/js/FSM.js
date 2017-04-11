@@ -517,10 +517,10 @@ let gameRun = function(){ //运行游戏真动画
         }
       }
       if(
-        enemy.x + enemyWidth > player.x &&
-        enemy.x < player.x + player.width &&
-        enemy.y + enemyHeight > player.y &&
-        enemy.y < player.y + player.height &&
+        enemy.x + 0.8*enemyWidth > player.x &&
+        enemy.x + 0.2*enemyWidth < player.x + player.width &&
+        enemy.y + 0.8*enemyHeight > player.y &&
+        enemy.y + 0.2*enemyHeight < player.y + player.height &&
         !player.dieFlag
       ){
         // console.info(1);
