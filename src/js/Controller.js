@@ -16,5 +16,6 @@ export default class Controller {
     };
     this.isPaused = false;
     this.enemyInterval = config.enemyInterval;
+    this.AIInterval = config.AIInterval;
   }
 }

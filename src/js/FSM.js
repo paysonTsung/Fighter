@@ -86,12 +86,25 @@ let randomPlane = function(){ //随机敌机
   }
 }
 
+let randomAI = function(){ //随机智能机群
+  let index = Math.random();
+  if(index < 0.33){
+    return 'AI-I';
+  }
+  if(index >= 0.33 && index <= 0.66){
+    return 'AI-II';
+  }
+  if(index > 0.66){
+    return 'AI-III';
+  }
+}
+
 let randomProp = function(){ //随机道具
   let index = Math.random();
-  if(index < 0.5){
+  if(index < 0.4){
     return 'bomb';
   }
-  if(index >= 0.5){
+  if(index >= 0.4){
     return 'weapon';
   }
 }
@@ -327,7 +340,11 @@ let gameRun = function(){ //运行游戏真动画
             dieEnemy.dieLen = dieLen;
             dieEnemy.countDown = dieLen * dieInterval;
             dieArr.push(dieEnemy);
-            player.score += score[dieEnemy.type];
+            if(dieEnemy.isAI){
+              player.score += 2 * score[dieEnemy.type];
+            }else{
+              player.score += score[dieEnemy.type];
+            }
             this.globalSrcBuffer.soundPlay(`${dieEnemy.type}_die.mp3`);
           }
           break;
@@ -350,17 +367,124 @@ let gameRun = function(){ //运行游戏真动画
       enemyArr.push(newEnemy);
     }
   }
+  let sendAIEnemey = () => {
+    if(frame.counter % ctrler.AIInterval == 0){
+      let AI = randomAI();
+      switch(AI){
+        case 'AI-I': //横飞智能机
+          {
+            let {smallPlaneHeight} = config;
+            let randomY = randomNum(100, height - config['smallPlaneWidth'] - 100);
+            let cnt = 0;
+            ctrler.AITimer = setInterval(() => {
+              if(cnt == 12){
+                clearInterval(ctrler.AITimer);
+              }
+              let newEnemy1 = Enemy.getEnemy(
+                -smallPlaneHeight, 
+                randomY - 80,
+                'smallPlane',
+                5,
+                0,
+                true,
+                'right'
+              );
+              let newEnemy2 = Enemy.getEnemy(
+                width, 
+                randomY,
+                'smallPlane',
+                -5,
+                0,
+                true,
+                'left'
+              );
+              let newEnemy3 = Enemy.getEnemy(
+                -smallPlaneHeight, 
+                randomY + 80,
+                'smallPlane',
+                5,
+                0,
+                true,
+                'right'
+              );
+              enemyArr.push(newEnemy1, newEnemy2, newEnemy3);
+              cnt++;
+            }, 300);
+            break;
+          }
+        case 'AI-II': //锁敌智能机
+          {
+            let {smallPlaneWidth, smallPlaneHeight} = config;
+            let cnt = 0;
+            ctrler.AITimer = setInterval(() => {
+              if(cnt == 15){
+                clearInterval(ctrler.AITimer);
+              }
+              let newEnemy1 = Enemy.getEnemy(
+                -smallPlaneWidth,
+                -smallPlaneHeight,
+                'smallPlane',
+                player.x / 90,
+                player.y / 90,
+                true
+              );
+              let newEnemy2 = Enemy.getEnemy(
+                width,
+                -smallPlaneHeight,
+                'smallPlane',
+                -(width - player.x) / 90,
+                player.y / 90,
+                true
+              );
+              enemyArr.push(newEnemy1, newEnemy2);
+              cnt++;
+            }, 300);
+            break;
+          }
+        case 'AI-III': //并飞智能机
+          {
+            let {mediumPlaneWidth, mediumPlaneHeight} = config;
+            let cnt = 0;
+            ctrler.AITimer = setInterval(() => {
+              if(cnt == 8){
+                clearInterval(ctrler.AITimer);
+              }
+              let newEnemy1 = Enemy.getEnemy(
+                mediumPlaneWidth,
+                -mediumPlaneHeight,
+                'mediumPlane',
+                0,
+                3,
+                true
+              );
+              let newEnemy2 = Enemy.getEnemy(
+                width - 2*mediumPlaneWidth,
+                -mediumPlaneHeight,
+                'mediumPlane',
+                0,
+                3,
+                true
+              );
+              enemyArr.push(newEnemy1, newEnemy2);
+              cnt++;
+            }, 500);
+          }
+        default:
+          break;
+      }
+    }
+  }
   let renderEnemy = () => {
     for(let i = enemyArr.length; i--;){
       let enemy = enemyArr[i];
-      let type = enemy.type;
+      let {type, dir} = enemy;
       let enemyHeight = config[`${type}Height`];
       let enemyWidth = config[`${type}Width`];
-      if(enemy.y > height + enemyHeight){
+      if(enemy.y > height + enemyHeight || enemy.x < -300 || enemy.x > width + 300){
         let del = enemyArr.splice(i, 1)[0];
         Enemy.recoverEnemy(del);
         continue;
-      }
+      } //todo
       if(type == 'largePlane'){
         if(frame.counter % 7 == 0){
           enemy.imgIndex = Number(!enemy.imgIndex);
@@ -374,7 +498,11 @@ let gameRun = function(){ //运行游戏真动画
         if(type == 'mediumPlane' && enemy.blood < config.planeBlood.mediumPlane / 2){
           this.drawImg('mediumPlane_hurt.png', enemy.x, enemy.y);
         }
-        this.drawImg(`${type}.png`, enemy.x, enemy.y);    
+        if(dir){
+          this.drawImg(`${type}_${dir}.png`, enemy.x, enemy.y);
+        }else{
+          this.drawImg(`${type}.png`, enemy.x, enemy.y);
+        }
       }
       if(
         enemy.x + enemyWidth > player.x &&
@@ -388,7 +516,8 @@ let gameRun = function(){ //运行游戏真动画
         player.countDown = player.dieLen * config.dieInterval;
         this.globalSrcBuffer.soundPlay('player_bomb.mp3');
       }
-      enemy.y += config[`${type}Speed`];
+      enemy.y += enemy.shiftY;
+      enemy.x += enemy.shiftX;
     }
   }
   let renderDieEnemy = () => {
@@ -398,8 +527,12 @@ let gameRun = function(){ //运行游戏真动画
         let delEnemy = dieArr.splice(i, 1)[0];
         Enemy.recoverEnemy(delEnemy);
       }else{
-        let dieIndex = Math.floor(diePlane.dieLen - diePlane.countDown / 10);      
-        this.drawImg(`${diePlane.type}_die${dieIndex}.png`, diePlane.x, diePlane.y);
+        let dieIndex = Math.floor(diePlane.dieLen - diePlane.countDown / 10);
+        if(diePlane.dir){
+          this.drawImg(`${diePlane.type}_${diePlane.dir}_die${dieIndex}.png`, diePlane.x, diePlane.y);
+        }else{
+          this.drawImg(`${diePlane.type}_die${dieIndex}.png`, diePlane.x, diePlane.y);
+        }
       }
       diePlane.countDown--;
     }
@@ -461,6 +594,7 @@ let gameRun = function(){ //运行游戏真动画
   sendBullet(); //发放子弹
   renderBullet(); //渲染子弹
   sendEnemy(); //派发敌机
+  sendAIEnemey(); //派发智能机群
   renderEnemy(); //渲染敌机
   renderDieEnemy(); //渲染爆炸敌机
   if(renderPlayer()){ //渲染玩家飞机
