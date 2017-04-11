@@ -15,7 +15,7 @@ let changeUIState = function(type, ui){
     this.hideUI(ui);
   }
   let upperState = ui.toUpperCase();
-  if(type == 'show'){
+  if(type === 'show'){
     return show.after(function(){
       this.curState = `${upperState}_UI`;
     });
@@ -200,10 +200,10 @@ let gameRun = function(){ //运行游戏真动画
   frame.counter++;
 
   let promote = () => {
-    if(ctrler.enemyInterval == promoteMin){
+    if(ctrler.enemyInterval === promoteMin){
       return;
     }
-    if(frame.counter % promoteInterval == 0){
+    if(frame.counter % promoteInterval === 0){
       ctrler.enemyInterval--;
     }
   }
@@ -216,11 +216,11 @@ let gameRun = function(){ //运行游戏真动画
   let renderPlayer = () => {
     if(!player.dieFlag){
       this.drawImg(`player${player.playerIndex}.png`, player.x, player.y);
-      if(frame.counter % 5 == 0){
+      if(frame.counter % 5 === 0){
         player.playerIndex = Number(!player.playerIndex);
       }
     }else{
-      if(player.countDown == 0){
+      if(player.countDown === 0){
         this.curState = 'GAME_OVER_UI';
         this.drawImg('game_over.png', 0, 0);
         this.bombBtn.style.display = 'none';
@@ -265,7 +265,7 @@ let gameRun = function(){ //运行游戏真动画
   }
   let sendBullet = () => {
     let {bulletSpeed} = config;
-    if(frame.counter % bulletInterval == 0){
+    if(frame.counter % bulletInterval === 0){
       switch(player.weaponLevel){
         case 0:
           {
@@ -364,14 +364,14 @@ let gameRun = function(){ //运行游戏真动画
     }
   }
   let sendEnemy = () => {
-    if(frame.counter % ctrler.enemyInterval == 0){
+    if(frame.counter % ctrler.enemyInterval === 0){
       let planeType = randomPlane();
       let newEnemy = Enemy.getEnemy(
         randomNum(0, width - config[`${planeType}Width`]), 
         -config[`${planeType}Height`],
         planeType
       );
-      if(planeType == 'largePlane'){
+      if(planeType === 'largePlane'){
         newEnemy.imgIndex = 0;
         this.globalSrcBuffer.soundPlay('largePlane_flying.mp3');
       }
@@ -379,7 +379,7 @@ let gameRun = function(){ //运行游戏真动画
     }
   }
   let sendAIEnemey = () => {
-    if(frame.counter % ctrler.AIInterval == 0){
+    if(frame.counter % ctrler.AIInterval === 0){
       let AI = randomAI();
       switch(AI){
         case 'AI-I': //横飞智能机
@@ -388,7 +388,7 @@ let gameRun = function(){ //运行游戏真动画
             let randomY = randomNum(100, height - config['smallPlaneWidth'] - 100);
             let cnt = 0;
             ctrler.AITimer = setInterval(() => {
-              if(cnt == 12){
+              if(cnt === 12){
                 clearInterval(ctrler.AITimer);
               }
               let newEnemy1 = Enemy.getEnemy(
@@ -428,7 +428,7 @@ let gameRun = function(){ //运行游戏真动画
             let {smallPlaneWidth, smallPlaneHeight} = config;
             let cnt = 0;
             ctrler.AITimer = setInterval(() => {
-              if(cnt == 15){
+              if(cnt === 15){
                 clearInterval(ctrler.AITimer);
               }
               let newEnemy1 = Enemy.getEnemy(
@@ -458,7 +458,7 @@ let gameRun = function(){ //运行游戏真动画
             let cnt = 0;
             let randomX = randomNum(0, width/2 - mediumPlaneWidth);
             ctrler.AITimer = setInterval(() => {
-              if(cnt == 8){
+              if(cnt === 8){
                 clearInterval(ctrler.AITimer);
               }
               let newEnemy1 = Enemy.getEnemy(
@@ -497,8 +497,8 @@ let gameRun = function(){ //运行游戏真动画
         Enemy.recoverEnemy(del);
         continue;
       }
-      if(type == 'largePlane'){
-        if(frame.counter % 7 == 0){
+      if(type === 'largePlane'){
+        if(frame.counter % 7 === 0){
           enemy.imgIndex = Number(!enemy.imgIndex);
         }
         if(enemy.blood < config.planeBlood.largePlane / 2 && enemy.imgIndex == 1){
@@ -507,7 +507,7 @@ let gameRun = function(){ //运行游戏真动画
           this.drawImg(`${type}${enemy.imgIndex}.png`, enemy.x, enemy.y);
         }
       }else{
-        if(type == 'mediumPlane' && enemy.blood < config.planeBlood.mediumPlane / 2){
+        if(type === 'mediumPlane' && enemy.blood < config.planeBlood.mediumPlane / 2){
           this.drawImg('mediumPlane_hurt.png', enemy.x, enemy.y);
         }
         if(dir){
@@ -517,10 +517,10 @@ let gameRun = function(){ //运行游戏真动画
         }
       }
       if(
-        enemy.x + 0.8*enemyWidth > player.x &&
-        enemy.x + 0.2*enemyWidth < player.x + player.width &&
-        enemy.y + 0.8*enemyHeight > player.y &&
-        enemy.y + 0.2*enemyHeight < player.y + player.height &&
+        enemy.x + 0.8*enemyWidth > player.x + 0.1*player.width &&
+        enemy.x + 0.2*enemyWidth < player.x + 0.9*player.width &&
+        enemy.y + 0.8*enemyHeight > player.y + 0.1*player.height &&
+        enemy.y + 0.2*enemyHeight < player.y + 0.9*player.height &&
         !player.dieFlag
       ){
         // console.info(1);
@@ -535,7 +535,7 @@ let gameRun = function(){ //运行游戏真动画
   let renderDieEnemy = () => {
     for(let i = dieArr.length; i--;){
       let diePlane = dieArr[i];
-      if(diePlane.countDown == 0){
+      if(diePlane.countDown === 0){
         let delEnemy = dieArr.splice(i, 1)[0];
         Enemy.recoverEnemy(delEnemy);
       }else{
@@ -550,7 +550,7 @@ let gameRun = function(){ //运行游戏真动画
     }
   }
   let sendProps = () => {
-    if(frame.counter % propInterval == 0){
+    if(frame.counter % propInterval === 0){
       let propType = randomProp();
       this.globalSrcBuffer.soundPlay('prop_appear.mp3');
       ctrler.curProp = Prop.getProp(

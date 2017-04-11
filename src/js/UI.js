@@ -5,7 +5,7 @@ import {FSM} from './FSM';
 
 
 /*** 版本 ***/
-let version = '1.25';
+let version = '1.26';
 
 /*** 语言转换策略 ***/
 let lanChangeStrategy = {
@@ -49,7 +49,7 @@ export default class UI {
     this.ctx.drawImage(this.logo, (this.canvas.width - this.logo.width)/2, 200);
     this.ctx.fillStyle = 'black';
     this.ctx.font = 'bold 30px sans-serif';
-    this.ctx.fillText(version, 320, 220 + this.logo.height);
+    this.ctx.fillText(version, 320, 225 + this.logo.height);
   }
 
   drawImg(src, offsetX = 0, offsetY = 0){ //绘制图片
@@ -179,12 +179,12 @@ export default class UI {
     tempDiv.className = name;
     tempDiv.style.zIndex = 100;
     this.wrapper.appendChild(tempDiv);
-    if(typeof content == 'function'){
+    if(typeof content === 'function'){
       tempDiv.innerHTML = content();
     }else{
       tempDiv.innerHTML = content;
     }
-    if(name == 'set'){
+    if(name === 'set'){
       this._bindSetEvent();
     }
     return tempDiv;
@@ -199,7 +199,7 @@ export default class UI {
 
   showUI(name, content){ //显示子界面
     this.hideAllUI();
-    if(!this[name] || name == 'rank'){
+    if(!this[name] || name === 'rank'){
       this[name] = this.createUI(name, content);
     }
     this[name].style.display = 'block';
