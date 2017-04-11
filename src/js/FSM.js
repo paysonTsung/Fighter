@@ -435,16 +435,16 @@ let gameRun = function(){ //运行游戏真动画
                 -smallPlaneWidth,
                 -smallPlaneHeight,
                 'smallPlane',
-                player.x / 90,
-                player.y / 90,
+                (player.x + player.width/2) / 90,
+                (player.y + player.height/2) / 90,
                 true
               );
               let newEnemy2 = Enemy.getEnemy(
                 width,
                 -smallPlaneHeight,
                 'smallPlane',
-                -(width - player.x) / 90,
-                player.y / 90,
+                (player.width/2 -(width - player.x)) / 90,
+                (player.y + player.height/2) / 90,
                 true
               );
               enemyArr.push(newEnemy1, newEnemy2);
@@ -456,12 +456,13 @@ let gameRun = function(){ //运行游戏真动画
           {
             let {mediumPlaneWidth, mediumPlaneHeight} = config;
             let cnt = 0;
+            let randomX = randomNum(0, width/2 - mediumPlaneWidth);
             ctrler.AITimer = setInterval(() => {
               if(cnt == 8){
                 clearInterval(ctrler.AITimer);
               }
               let newEnemy1 = Enemy.getEnemy(
-                mediumPlaneWidth,
+                randomX,
                 -mediumPlaneHeight,
                 'mediumPlane',
                 0,
@@ -469,7 +470,7 @@ let gameRun = function(){ //运行游戏真动画
                 true
               );
               let newEnemy2 = Enemy.getEnemy(
-                width - 2*mediumPlaneWidth,
+                width - randomX - mediumPlaneWidth,
                 -mediumPlaneHeight,
                 'mediumPlane',
                 0,
@@ -495,7 +496,7 @@ let gameRun = function(){ //运行游戏真动画
         let del = enemyArr.splice(i, 1)[0];
         Enemy.recoverEnemy(del);
         continue;
-      } //todo
+      }
       if(type == 'largePlane'){
         if(frame.counter % 7 == 0){
           enemy.imgIndex = Number(!enemy.imgIndex);
@@ -519,7 +520,7 @@ let gameRun = function(){ //运行游戏真动画
         enemy.x + enemyWidth > player.x &&
         enemy.x < player.x + player.width &&
         enemy.y + enemyHeight > player.y &&
-        enemy.y < player.x + player.height &&
+        enemy.y < player.y + player.height &&
         !player.dieFlag
       ){
         // console.info(1);

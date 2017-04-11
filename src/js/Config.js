@@ -44,7 +44,7 @@ export let config = {
     largePlane: 3500
   },
   dieInterval: 10, // 玩家/敌机死亡动画间隔/帧
-  propInterval: 500, // 道具发放间隔/帧
+  propInterval: 400, // 道具发放间隔/帧
   enemyInterval: 40, // 敌机出现初始间隔/帧
   AIInterval: 500, // 智能敌机出现初始间隔/帧
   bulletInterval: 8, // 子弹发射间隔/帧
