@@ -5,7 +5,7 @@ import {FSM} from './FSM';
 
 
 /*** 版本 ***/
-let version = '1.26';
+let version = 'v1.27';
 
 /*** 语言转换策略 ***/
 let lanChangeStrategy = {
@@ -217,7 +217,7 @@ export default class UI {
     }
   }
 
-  _preventDefault(){
+  _preventDefault(){ //阻止浏览器默认事件
     if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
       window.addEventListener('touchmove', (e) => {
         e.preventDefault();
