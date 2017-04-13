@@ -17,6 +17,11 @@ export default class Player extends Plane {
     this.dieFlag = false; //死亡flag
     this.dieLen = config.dieImgNum.player; //死亡图片数
   }
+  attacked(srcBuffer){
+    this.dieFlag = true;
+    this.countDown = this.dieLen * config.dieInterval;
+    srcBuffer.soundPlay('player_bomb.mp3');
+  }
   bindTouchEvent(dom){ //绑定移动事件
     let planeBoundaryMinX = 0;
     let planeBoundaryMaxX = config.canvasWidth -  config.playerWidth;
@@ -52,7 +57,7 @@ export default class Player extends Plane {
       });
     });
   }
-  bindBombEvent(dom, srcBuffer, enemyArr, dieArr){ //绑定爆炸事件
+  bindBombEvent(dom, srcBuffer, enemyArr, dieArr, ctrler){ //绑定爆炸事件
     dom.addEventListener('touchend', (e) => {
       if(this.bomb){
         this.bomb--;
@@ -65,7 +70,12 @@ export default class Player extends Plane {
           dieArr.push(dieEnemy);
           this.score += config.score[dieEnemy.type];
           srcBuffer.soundPlay('use_bomb.mp3');
-        }   
+        }
+        let {boss} = ctrler;
+        if(boss && boss.state !== 'Appear'){
+          let damage = 400 + this.weaponLevel * 100;
+          boss.attacked(damage, ctrler);
+        }
       }
     });
   }

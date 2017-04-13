@@ -1,10 +1,11 @@
 import {lanStrategy} from './Language';
 import {config} from './Config';
-import {getStyle, getID, getClass, createObjPool, randomNum} from './Utils';
+import {getStyle, getID, getClass, createObjPool, randomNum, firstLower} from './Utils';
 import Controller from './Controller';
 import Bullet from './Bullet';
 import Enemy from './Enemy';
 import Prop from './Prop';
+import Boss from './Boss';
 
 
 let changeUIState = function(type, ui){
@@ -143,9 +144,11 @@ let {
   bombHeight,
   buttonWidth,
   buttonHeight,
+  bossWidth,
+  bossHeight,
   score,
   promoteInterval,
-  promoteMin
+  promoteMin,
 } = config;
 
 
@@ -169,7 +172,7 @@ let startGame = function(){ //启动游戏
 
   //绑定飞机移动事件、炸弹事件、暂停事件
   this.controller.player.bindTouchEvent(this.canvas);
-  this.controller.player.bindBombEvent(this.bombBtn, this.globalSrcBuffer, enemyArr, dieArr);
+  this.controller.player.bindBombEvent(this.bombBtn, this.globalSrcBuffer, enemyArr, dieArr, this.controller);
   if(!this.ctrlEventBinded){
     this.bindCtrlEvent();
     this.ctrlEventBinded = true;
@@ -263,6 +266,7 @@ let gameRun = function(){ //运行游戏真动画
       player.countDown--;
     }
   }
+
   let sendBullet = () => {
     let {bulletSpeed} = config;
     if(frame.counter % bulletInterval === 0){
@@ -322,8 +326,9 @@ let gameRun = function(){ //运行游戏真动画
       this.globalSrcBuffer.soundPlay('biubiubiu.mp3');
     }
   }
+
   let renderBullet = () => {
-     for(let i = bulletArr.length; i--;){
+     outer: for(let i = bulletArr.length; i--;){
       let bullet = bulletArr[i];
       if(bullet.y < -config.bulletHeight){
         let delBullet = bulletArr.splice(i, 1)[0];
@@ -358,11 +363,24 @@ let gameRun = function(){ //运行游戏真动画
             }
             this.globalSrcBuffer.soundPlay(`${dieEnemy.type}_die.mp3`);
           }
-          break;
+          break outer;
         }
+      }
+      let {boss} = ctrler;
+      if(boss && boss.state !== 'Appear' && !boss.dieFlag &&
+        bullet.x + config.bulletWidth > boss.x &&
+        bullet.x < boss.x + config.bossWidth &&
+        bullet.y + config.bulletHeight > boss.y &&
+        bullet.y < boss.y + config.bossHeight
+      ){
+        let delBullet = bulletArr.splice(i, 1)[0];
+        Bullet.recoverBullet(delBullet);
+        player.score += (delBullet.damage * 12);
+        boss.attacked(delBullet.damage, ctrler);
       }
     }
   }
+
   let sendEnemy = () => {
     if(frame.counter % ctrler.enemyInterval === 0){
       let planeType = randomPlane();
@@ -378,6 +396,7 @@ let gameRun = function(){ //运行游戏真动画
       enemyArr.push(newEnemy);
     }
   }
+
   let sendAIEnemey = () => {
     if(frame.counter % ctrler.AIInterval === 0){
       let AI = randomAI();
@@ -486,6 +505,7 @@ let gameRun = function(){ //运行游戏真动画
       }
     }
   }
+
   let renderEnemy = () => {
     for(let i = enemyArr.length; i--;){
       let enemy = enemyArr[i];
@@ -523,15 +543,13 @@ let gameRun = function(){ //运行游戏真动画
         enemy.y + 0.2*enemyHeight < player.y + 0.9*player.height &&
         !player.dieFlag
       ){
-        // console.info(1);
-        player.dieFlag = true;
-        player.countDown = player.dieLen * config.dieInterval;
-        this.globalSrcBuffer.soundPlay('player_bomb.mp3');
+        player.attacked(this.globalSrcBuffer);
       }
       enemy.y += enemy.shiftY;
       enemy.x += enemy.shiftX;
     }
   }
+
   let renderDieEnemy = () => {
     for(let i = dieArr.length; i--;){
       let diePlane = dieArr[i];
@@ -549,6 +567,60 @@ let gameRun = function(){ //运行游戏真动画
       diePlane.countDown--;
     }
   }
+
+  let sendBoss = () => {
+    if(player.score > ctrler.showBossScore){
+      ctrler.showBossScore += config.showBossScore;
+      this.globalSrcBuffer.soundPlay('warning.mp3');
+      if(!ctrler.boss){
+        ctrler.boss = new Boss(ctrler.bossLevel);
+      }
+    }
+  }
+
+  let renderBoss = () => {
+    let {boss} = ctrler;
+    let {ctx} = this;
+    let bossText = `Lv.${boss.level} Boss`;
+    let textWidth = ctx.measureText(bossText).width; 
+    let {blood, maxBlood, x, y} = boss;
+    let bloodBarWidth = bossWidth * 0.8;
+    let bloodBarHeight = 14;
+    let bloodBarPosX = x + bossWidth*0.1;
+    let bloodBarPosY = y - 20;
+    let bossState = firstLower(boss.state);
+    this.drawImg(`boss_${bossState}.png`, x, y);
+    ctx.strokeStyle = 'black';
+    ctx.strokeRect(bloodBarPosX, bloodBarPosY, bloodBarWidth, bloodBarHeight);
+    ctx.fillStyle = 'red';
+    if(blood < 0){
+      blood = 0;
+    }
+    ctx.fillRect(bloodBarPosX, bloodBarPosY, bloodBarWidth * (blood / maxBlood), bloodBarHeight);
+    ctx.font = '24px sans-serif';
+    ctx.fillStyle = 'black';
+    ctx.fillText(bossText, x + (bossWidth - textWidth)/2 + 28, y - 24);
+    boss.move();
+    if(
+      boss.x + 0.9*bossWidth > player.x &&
+      boss.x + 0.1*bossWidth < player.x + player.width &&
+      boss.y + 0.9*bossHeight > player.y &&
+      boss.y + 0.1*bossHeight < player.y + player.height &&
+      !player.dieFlag
+    ){
+      player.attacked(this.globalSrcBuffer);
+    }
+  }
+
+  let renderDieBoss = () => {
+    let {boss} = ctrler;
+    this.drawImg('boss_die.png', boss.x, boss.y);
+    boss.countDown--;
+    if(boss.countDown === 0){
+      ctrler.boss = null;
+    }
+  }
+
   let sendProps = () => {
     if(frame.counter % propInterval === 0){
       let propType = randomProp();
@@ -560,6 +632,7 @@ let gameRun = function(){ //运行游戏真动画
       );
     }
   }
+
   let renderProps = () => {
     if(ctrler.curProp){
       this.drawImg(`prop_${ctrler.curProp.type}.png`, ctrler.curProp.x, ctrler.curProp.y);
@@ -580,19 +653,24 @@ let gameRun = function(){ //运行游戏真动画
       }
     }
   }
+
   let renderBomb = () => {
     if(player.bomb){
       this.drawImg('bomb.png', 10, height - bombHeight - 10);
       this.ctx.font = '30px sans-serif';
+      this.ctx.fillStyle = 'black';
       this.ctx.fillText(`× ${player.bomb}`, bombWidth + 20, height - bombHeight / 2);
     }
   }
+
   let renderScore = () => {
     if(player.score){
       this.ctx.font = '34px sans-serif';
+      this.ctx.fillStyle = 'black';
       this.ctx.fillText(`${lanStrategy[this.language].score}：${player.score}`, 70, 40);
     }
   }
+
   let renderCtrl = () => {
     if(!ctrler.isPaused){
       this.drawImg('game_pause.png', 0, 5);
@@ -605,10 +683,19 @@ let gameRun = function(){ //运行游戏真动画
   backScroll(); //滚动背景
   sendBullet(); //发放子弹
   renderBullet(); //渲染子弹
-  sendEnemy(); //派发敌机
-  sendAIEnemey(); //派发智能机群
+  if(!ctrler.boss){
+    sendEnemy(); //派发敌机
+    sendAIEnemey(); //派发智能机群
+  }
   renderEnemy(); //渲染敌机
   renderDieEnemy(); //渲染爆炸敌机
+  sendBoss(); //派发Boss
+  if(ctrler.boss){
+    renderBoss(); //渲染Boss
+  }
+  if(ctrler.boss && ctrler.boss.dieFlag){
+    renderDieBoss();
+  }
   if(renderPlayer()){ //渲染玩家飞机
     return;//终止
   }

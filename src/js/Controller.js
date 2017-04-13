@@ -17,5 +17,8 @@ export default class Controller {
     this.isPaused = false;
     this.enemyInterval = config.enemyInterval;
     this.AIInterval = config.AIInterval;
+    this.boss = null;
+    this.bossLevel = 1;
+    this.showBossScore = config.showBossScore;
   }
 }

@@ -5,7 +5,7 @@ import {FSM} from './FSM';
 
 
 /*** 版本 ***/
-let version = 'v1.27';
+let version = 'v1.3.0';
 
 /*** 语言转换策略 ***/
 let lanChangeStrategy = {
@@ -50,6 +50,7 @@ export default class UI {
     this.ctx.fillStyle = 'black';
     this.ctx.font = 'bold 30px sans-serif';
     this.ctx.fillText(version, 320, 225 + this.logo.height);
+    this.drawImg('boss_bullet.jpg', 280, 200 + this.logo.height);
   }
 
   drawImg(src, offsetX = 0, offsetY = 0){ //绘制图片

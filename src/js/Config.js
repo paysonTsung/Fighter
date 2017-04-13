@@ -27,6 +27,8 @@ export let config = {
   bombMax: 3, //炸弹上限
   buttonWidth: 60,
   buttonHeight: 45,
+  bossWidth: 300,
+  bossHeight: 300,
   planeBlood: {
     smallPlane: 1,
     mediumPlane: 12,
@@ -51,6 +53,8 @@ export let config = {
   promoteInterval: 120, //难度提升间隔/帧
   promoteMin: 20, //难度提升最小间隔/帧
   firepowerTime: 2e4, // 火力全开持续时间/ms
+  showBossScore: 2e5, //出现boss的初始分数
+  bossBlood: 200, //boss初始血量
   backgroundImgSrc: 'background.jpg',
   logoSrc: 'logo.png',
   loadImageSrc: [
@@ -100,7 +104,13 @@ export let config = {
     'largePlane_die5.png',
     'game_pause.png',
     'game_resume.png',
-    'game_over.png'
+    'game_over.png',
+    'boss_bullet.jpg',
+    'boss_left.png',
+    'boss_right.png',
+    'boss_appear.png',
+    'boss_die.png',
+    'boss_angry.png'
   ],
   gameAudioSrc: [
     'music.mp3',
@@ -115,6 +125,7 @@ export let config = {
     'prop_appear.mp3',
     'use_bomb.mp3',
     'largePlane_flying.mp3',
-    'achievement.mp3'
+    'achievement.mp3',
+    'warning.mp3'
   ]
 }

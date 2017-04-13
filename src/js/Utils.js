@@ -11,6 +11,9 @@ var create = function(str){
 var firstUpper = function(str){
   return str.slice(0, 1).toUpperCase() + str.slice(1);
 };
+var firstLower = function(str){
+  return str.slice(0, 1).toLowerCase() + str.slice(1);
+};
 var removeDOM = function(dom){
   var parentNode = dom.parentNode;
   if(parentNode){
@@ -63,6 +66,7 @@ export {
   getClass,
   create,
   firstUpper,
+  firstLower,
   removeDOM,
   getStyle,
   createObjPool,
