@@ -47,6 +47,11 @@ export let config = {
     mediumPlane: 1200,
     largePlane: 3500
   },
+  grow: {
+    smallPlane: 0.5,
+    mediumPlane: 0.2,
+    largePlane: 0.1
+  },
   dieInterval: 10, // 玩家/敌机死亡动画间隔/帧
   propInterval: 400, // 道具发放间隔/帧
   enemyInterval: 40, // 敌机出现初始间隔/帧

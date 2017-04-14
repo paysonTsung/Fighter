@@ -1,5 +1,5 @@
-import Plane from './Plane';
 import {config} from './Config';
+import Plane from './Plane';
 export default class Boss extends Plane{
   constructor(level, x = -999, y = -999){
     super(x, y);

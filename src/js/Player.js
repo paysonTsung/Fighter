@@ -1,4 +1,5 @@
 import {config} from './Config';
+import BossBullet from './BossBullet';
 import Plane from './Plane';
 import UI from './UI';
 export default class Player extends Plane {
@@ -73,8 +74,12 @@ export default class Player extends Plane {
         }
         let {boss} = ctrler;
         if(boss && boss.state !== 'Appear'){
-          let damage = 400 + this.weaponLevel * 100;
+          let damage = 200 + this.weaponLevel * 50;
           boss.attacked(damage, ctrler);
+          for(let i = boss.bullets.length - 1, bullet; bullet = boss.bullets[i--];){
+            BossBullet.recoverBullet(bullet);
+          }
+          boss.bullets = [];
         }
       }
     });

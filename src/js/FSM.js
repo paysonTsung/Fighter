@@ -1,12 +1,12 @@
-import {lanStrategy} from './Language';
-import {config} from './Config';
 import {getStyle, getID, getClass, createObjPool, randomNum, firstLower} from './Utils';
+import {lanStrategy} from './Language';
 import Controller from './Controller';
+import BossBullet from './BossBullet';
+import {config} from './Config';
 import Bullet from './Bullet';
 import Enemy from './Enemy';
 import Prop from './Prop';
 import Boss from './Boss';
-import BossBullet from './BossBullet';
 
 let changeUIState = function(type, ui){
   function show(){
@@ -73,43 +73,6 @@ let againGame = again.before(function(){
   this.curState = 'IN_GAME_UI';
 });
 
-
-let randomPlane = function(){ //随机敌机
-  let index = Math.random();
-  if(index < 0.7){
-    return 'smallPlane';
-  }
-  if(index >= 0.7 && index < 0.9){
-    return 'mediumPlane';
-  }
-  if(index >= 0.9){
-    return 'largePlane';
-  }
-}
-
-let randomAI = function(){ //随机智能机群
-  let index = Math.random();
-  if(index < 0.33){
-    return 'AI-I';
-  }
-  if(index >= 0.33 && index <= 0.66){
-    return 'AI-II';
-  }
-  if(index > 0.66){
-    return 'AI-III';
-  }
-}
-
-let randomProp = function(){ //随机道具
-  let index = Math.random();
-  if(index < 0.3){
-    return 'bomb';
-  }
-  if(index >= 0.3){
-    return 'weapon';
-  }
-}
-
 let propStrategy = { //道具策略
   bomb: function(player){
     let bombNum = player.bomb;
@@ -147,8 +110,6 @@ let {
   bossWidth,
   bossHeight,
   score,
-  promoteInterval,
-  promoteMin,
   bossBulletWidth,
   bossBulletHeight
 } = config;
@@ -205,14 +166,6 @@ let gameRun = function(){ //运行游戏真动画
 
   frame.counter++;
 
-  // let promote = () => {
-  //   if(ctrler.enemyInterval === promoteMin){
-  //     return;
-  //   }
-  //   if(frame.counter % promoteInterval === 0){
-  //     ctrler.enemyInterval--;
-  //   }
-  // }
   let backScroll = () => {
     back.y1 = (back.y1 === height) ? -height : (back.y1 + 1);
     back.y2 = (back.y2 === height) ? -height : (back.y2 + 1);
@@ -378,7 +331,7 @@ let gameRun = function(){ //运行游戏真动画
       ){
         let delBullet = bulletArr.splice(i, 1)[0];
         Bullet.recoverBullet(delBullet);
-        player.score += (delBullet.damage * 12);
+        player.score += (delBullet.damage * 7);
         boss.attacked(delBullet.damage, ctrler);
       }
     }
@@ -390,7 +343,7 @@ let gameRun = function(){ //运行游戏真动画
       enemyInterval = 20;
     }
     if(frame.counter % enemyInterval === 0){
-      let planeType = randomPlane();
+      let planeType = ctrler.randomPlane();
       let newEnemy = Enemy.getEnemy(
         randomNum(0, width - config[`${planeType}Width`]), 
         -config[`${planeType}Height`],
@@ -406,7 +359,7 @@ let gameRun = function(){ //运行游戏真动画
 
   let sendAIEnemey = () => {
     if(frame.counter % ctrler.AIInterval === 0){
-      let AI = randomAI();
+      let AI = ctrler.randomAI();
       switch(AI){
         case 'AI-I': //横飞智能机
           {
@@ -554,6 +507,9 @@ let gameRun = function(){ //运行游戏真动画
       }
       enemy.y += enemy.shiftY;
       enemy.x += enemy.shiftX;
+      if(!enemy.isAI){
+        enemy.y += config.grow[enemy.type]*gameLevel
+      }
     }
   }
 
@@ -737,7 +693,7 @@ let gameRun = function(){ //运行游戏真动画
 
   let sendProps = () => {
     if(frame.counter % propInterval === 0){
-      let propType = randomProp();
+      let propType = ctrler.randomProp();
       this.globalSrcBuffer.soundPlay('prop_appear.mp3');
       ctrler.curProp = Prop.getProp(
         randomNum(0, width - config.propWidth), 
@@ -793,7 +749,6 @@ let gameRun = function(){ //运行游戏真动画
     }
   }
 
-  // promote(); //敌机增加
   backScroll(); //滚动背景
   sendBullet(); //发放子弹
   renderBullet(); //渲染子弹

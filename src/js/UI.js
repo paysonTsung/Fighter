@@ -1,11 +1,11 @@
+import {lanStrategy} from './Language';
 import {config} from './Config';
 import * as $ from './Utils';
-import {lanStrategy} from './Language';
 import {FSM} from './FSM';
 
 
 /*** 版本 ***/
-let version = 'v1.3.2';
+let version = 'v1.3.3';
 
 /*** 语言转换策略 ***/
 let lanChangeStrategy = {

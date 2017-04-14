@@ -1,6 +1,6 @@
-import Plane from './Plane';
-import {createObjPool} from './Utils';
 import {config} from './Config';
+import {createObjPool} from './Utils';
+import Plane from './Plane';
 let enemyPool = createObjPool(() => {
   return new Enemy();
 });
