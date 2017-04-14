@@ -36,7 +36,7 @@ export default class Boss extends Plane{
   attacked(damage, ctrler){
     this.blood -= damage;
     if(this.blood < 0){
-      ctrler.bossLevel++;
+      ctrler.gameLevel++;
       ctrler.player.score += (1e4 + this.level*2000);
       this.dieFlag = true;
       this.countDown = 120;

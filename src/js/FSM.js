@@ -200,18 +200,19 @@ let gameRun = function(){ //运行游戏真动画
     dieArr,
     frame,
     back,
+    gameLevel
   } = ctrler;
 
   frame.counter++;
 
-  let promote = () => {
-    if(ctrler.enemyInterval === promoteMin){
-      return;
-    }
-    if(frame.counter % promoteInterval === 0){
-      ctrler.enemyInterval--;
-    }
-  }
+  // let promote = () => {
+  //   if(ctrler.enemyInterval === promoteMin){
+  //     return;
+  //   }
+  //   if(frame.counter % promoteInterval === 0){
+  //     ctrler.enemyInterval--;
+  //   }
+  // }
   let backScroll = () => {
     back.y1 = (back.y1 === height) ? -height : (back.y1 + 1);
     back.y2 = (back.y2 === height) ? -height : (back.y2 + 1);
@@ -384,7 +385,11 @@ let gameRun = function(){ //运行游戏真动画
   }
 
   let sendEnemy = () => {
-    if(frame.counter % ctrler.enemyInterval === 0){
+    let enemyInterval = (ctrler.enemyInterval - gameLevel * 2);
+    if(enemyInterval < 20){
+      enemyInterval = 20;
+    }
+    if(frame.counter % enemyInterval === 0){
       let planeType = randomPlane();
       let newEnemy = Enemy.getEnemy(
         randomNum(0, width - config[`${planeType}Width`]), 
@@ -409,14 +414,14 @@ let gameRun = function(){ //运行游戏真动画
             let randomY = randomNum(100, height - config['smallPlaneWidth'] - 100);
             let cnt = 0;
             ctrler.AITimer = setInterval(() => {
-              if(cnt === 12){
+              if(cnt === 8 + gameLevel){
                 clearInterval(ctrler.AITimer);
               }
               let newEnemy1 = Enemy.getEnemy(
                 -smallPlaneHeight, 
                 randomY - 80,
                 'smallPlane',
-                5,
+                4 + 0.2*gameLevel,
                 0,
                 true,
                 'right'
@@ -425,7 +430,7 @@ let gameRun = function(){ //运行游戏真动画
                 width, 
                 randomY,
                 'smallPlane',
-                -5,
+                -4 - 0.2*gameLevel,
                 0,
                 true,
                 'left'
@@ -434,7 +439,7 @@ let gameRun = function(){ //运行游戏真动画
                 -smallPlaneHeight, 
                 randomY + 80,
                 'smallPlane',
-                5,
+                4 + 0.2*gameLevel,
                 0,
                 true,
                 'right'
@@ -449,7 +454,7 @@ let gameRun = function(){ //运行游戏真动画
             let {smallPlaneWidth, smallPlaneHeight} = config;
             let cnt = 0;
             ctrler.AITimer = setInterval(() => {
-              if(cnt === 10){
+              if(cnt === 8 + gameLevel){
                 clearInterval(ctrler.AITimer);
               }
               let newEnemy1 = Enemy.getEnemy(
@@ -479,7 +484,7 @@ let gameRun = function(){ //运行游戏真动画
             let cnt = 0;
             let randomX = randomNum(0, width/2 - mediumPlaneWidth);
             ctrler.AITimer = setInterval(() => {
-              if(cnt === 8){
+              if(cnt === 7 + gameLevel){
                 clearInterval(ctrler.AITimer);
               }
               let newEnemy1 = Enemy.getEnemy(
@@ -487,7 +492,7 @@ let gameRun = function(){ //运行游戏真动画
                 -mediumPlaneHeight,
                 'mediumPlane',
                 0,
-                3,
+                3 + 0.2*gameLevel,
                 true
               );
               let newEnemy2 = Enemy.getEnemy(
@@ -495,7 +500,7 @@ let gameRun = function(){ //运行游戏真动画
                 -mediumPlaneHeight,
                 'mediumPlane',
                 0,
-                3,
+                3 + 0.2*gameLevel,
                 true
               );
               enemyArr.push(newEnemy1, newEnemy2);
@@ -575,7 +580,7 @@ let gameRun = function(){ //运行游戏真动画
       ctrler.showBossScore += config.showBossScore;
       this.globalSrcBuffer.soundPlay('warning.mp3');
       if(!ctrler.boss){
-        ctrler.boss = new Boss(ctrler.bossLevel);
+        ctrler.boss = new Boss(ctrler.gameLevel);
       }
     }
   }
@@ -628,34 +633,34 @@ let gameRun = function(){ //运行游戏真动画
       let fireX = boss.x + bossWidth / 2;
       let fireY = boss.y + bossHeight;
       switch(boss.curBullet){
-        case 1:
+        case 1: //直线弹幕
           {
             if(boss.showTime % 10 === 0){
-              let newBullet = BossBullet.getBullet(fireX, fireY, 0, 8);
+              let newBullet = BossBullet.getBullet(fireX, fireY, 0, 7 + 0.5*gameLevel);
               boss.bullets.push(newBullet);
             }
             break;
           }
-        case 2:
+        case 2: //锁定弹幕
           {
             let ratio = (player.x + player.width/2 - fireX) / (player.y + player.height/2 - fireY);
-            if(boss.showTime % 20 === 0){
-              let newBullet = BossBullet.getBullet(fireX, fireY, 7 * ratio, 7);
+            if(boss.showTime % 25 === 0){
+              let newBullet = BossBullet.getBullet(fireX, fireY, (6 + 0.2*gameLevel) * ratio, 6 + 0.2*gameLevel);
               boss.bullets.push(newBullet);
             }
             break;
           }
-        case 3:
+        case 3: //散弹弹幕
           {
             if(boss.showTime % 20 === 0){
-              let newBullet = BossBullet.getBullet(fireX, fireY, 0, 8);
-              let newLeftBullet = BossBullet.getBullet(fireX, fireY, -4, 6);
-              let newRightBullet = BossBullet.getBullet(fireX, fireY, 4, 6);
+              let newBullet = BossBullet.getBullet(fireX, fireY, 0, 8 + 0.2*gameLevel);
+              let newLeftBullet = BossBullet.getBullet(fireX, fireY, -4, 6 + 0.2*gameLevel);
+              let newRightBullet = BossBullet.getBullet(fireX, fireY, 4, 6 + 0.2*gameLevel);
               boss.bullets.push(newBullet, newLeftBullet, newRightBullet);
             }
             break;
           }
-        case 4: 
+        case 4: //横弹幕
           {
             let ratio = (player.x + player.width/2 - fireX) / (player.y + player.height/2 - fireY);
             if(boss.showTime % 33 === 0){
@@ -666,12 +671,12 @@ let gameRun = function(){ //运行游戏真动画
             }
             break;
           }
-        case 5: 
+        case 5: //加速弹幕
           {
             if(boss.showTime % 33 === 0){
-              let newBullet = BossBullet.getBullet(fireX - 120, fireY - 30, -1, 1, 0, 0.3);
-              let newLeftBullet = BossBullet.getBullet(fireX, fireY, 0, 1, 0, 0.3);
-              let newRightBullet = BossBullet.getBullet(fireX + 120, fireY - 30, 1, 1, 0, 0.3);
+              let newBullet = BossBullet.getBullet(fireX - 120, fireY - 30, -1, 1, 0, 0.3 + 0.01*gameLevel);
+              let newLeftBullet = BossBullet.getBullet(fireX, fireY, 0, 1, 0, 0.3 + 0.01*gameLevel);
+              let newRightBullet = BossBullet.getBullet(fireX + 120, fireY - 30, 1, 1, 0, 0.3 + 0.01*gameLevel);
               boss.bullets.push(newBullet, newLeftBullet, newRightBullet);
             }
             break;
@@ -788,7 +793,7 @@ let gameRun = function(){ //运行游戏真动画
     }
   }
 
-  promote(); //敌机增加
+  // promote(); //敌机增加
   backScroll(); //滚动背景
   sendBullet(); //发放子弹
   renderBullet(); //渲染子弹
