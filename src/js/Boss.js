@@ -10,6 +10,7 @@ export default class Boss extends Plane{
     this.blood = config.bossBlood + this.level * 120;
     this.maxBlood = this.blood;
     this.dieFlag = false;
+    this.bullets = [];
   }
   _moveAppear(){
     if(this.y > 80){

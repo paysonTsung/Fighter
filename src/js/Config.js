@@ -29,6 +29,8 @@ export let config = {
   buttonHeight: 45,
   bossWidth: 300,
   bossHeight: 300,
+  bossBulletWidth: 30,
+  bossBulletHeight: 30,
   planeBlood: {
     smallPlane: 1,
     mediumPlane: 12,

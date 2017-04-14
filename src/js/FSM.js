@@ -6,7 +6,7 @@ import Bullet from './Bullet';
 import Enemy from './Enemy';
 import Prop from './Prop';
 import Boss from './Boss';
-
+import BossBullet from './BossBullet';
 
 let changeUIState = function(type, ui){
   function show(){
@@ -149,6 +149,8 @@ let {
   score,
   promoteInterval,
   promoteMin,
+  bossBulletWidth,
+  bossBulletHeight
 } = config;
 
 
@@ -447,7 +449,7 @@ let gameRun = function(){ //运行游戏真动画
             let {smallPlaneWidth, smallPlaneHeight} = config;
             let cnt = 0;
             ctrler.AITimer = setInterval(() => {
-              if(cnt === 15){
+              if(cnt === 10){
                 clearInterval(ctrler.AITimer);
               }
               let newEnemy1 = Enemy.getEnemy(
@@ -589,7 +591,11 @@ let gameRun = function(){ //运行游戏真动画
     let bloodBarPosX = x + bossWidth*0.1;
     let bloodBarPosY = y - 20;
     let bossState = firstLower(boss.state);
-    this.drawImg(`boss_${bossState}.png`, x, y);
+    if(boss.showTime && !boss.dieFlag){
+      this.drawImg('boss_angry.png', x, y);
+    }else{
+      this.drawImg(`boss_${bossState}.png`, x, y);
+    }
     ctx.strokeStyle = 'black';
     ctx.strokeRect(bloodBarPosX, bloodBarPosY, bloodBarWidth, bloodBarHeight);
     ctx.fillStyle = 'red';
@@ -609,6 +615,109 @@ let gameRun = function(){ //运行游戏真动画
       !player.dieFlag
     ){
       player.attacked(this.globalSrcBuffer);
+    }
+  }
+
+  let sendBossBullet = () => {
+    let {boss} = ctrler;
+    if(frame.counter % 200 === 0 || boss.showTime !== 0){
+      if(!boss.showTime){
+        boss.showTime = 100;
+        boss.curBullet = randomNum(1, 6);
+      }
+      let fireX = boss.x + bossWidth / 2;
+      let fireY = boss.y + bossHeight;
+      switch(boss.curBullet){
+        case 1:
+          {
+            if(boss.showTime % 10 === 0){
+              let newBullet = BossBullet.getBullet(fireX, fireY, 0, 8);
+              boss.bullets.push(newBullet);
+            }
+            break;
+          }
+        case 2:
+          {
+            let ratio = (player.x + player.width/2 - fireX) / (player.y + player.height/2 - fireY);
+            if(boss.showTime % 20 === 0){
+              let newBullet = BossBullet.getBullet(fireX, fireY, 7 * ratio, 7);
+              boss.bullets.push(newBullet);
+            }
+            break;
+          }
+        case 3:
+          {
+            if(boss.showTime % 20 === 0){
+              let newBullet = BossBullet.getBullet(fireX, fireY, 0, 8);
+              let newLeftBullet = BossBullet.getBullet(fireX, fireY, -4, 6);
+              let newRightBullet = BossBullet.getBullet(fireX, fireY, 4, 6);
+              boss.bullets.push(newBullet, newLeftBullet, newRightBullet);
+            }
+            break;
+          }
+        case 4: 
+          {
+            let ratio = (player.x + player.width/2 - fireX) / (player.y + player.height/2 - fireY);
+            if(boss.showTime % 33 === 0){
+              let newBullet = BossBullet.getBullet(fireX - 60, fireY, 3 * ratio, 3);
+              let newLeftBullet = BossBullet.getBullet(fireX, fireY, 3 * ratio, 3);
+              let newRightBullet = BossBullet.getBullet(fireX + 60, fireY, 3 * ratio, 3);
+              boss.bullets.push(newBullet, newLeftBullet, newRightBullet);
+            }
+            break;
+          }
+        case 5: 
+          {
+            if(boss.showTime % 33 === 0){
+              let newBullet = BossBullet.getBullet(fireX - 120, fireY - 30, -1, 1, 0, 0.3);
+              let newLeftBullet = BossBullet.getBullet(fireX, fireY, 0, 1, 0, 0.3);
+              let newRightBullet = BossBullet.getBullet(fireX + 120, fireY - 30, 1, 1, 0, 0.3);
+              boss.bullets.push(newBullet, newLeftBullet, newRightBullet);
+            }
+            break;
+          }
+      }
+      boss.showTime--;
+    }
+  }
+
+  let renderBossBullet = () => {
+    let {bullets} = ctrler.boss;
+    if(bullets.length !== 0){
+       for(let i = bullets.length; i--;){
+        let bullet = bullets[i];
+        if(bullet.y > height && 
+          bullet.y < -bossBulletHeight && 
+          bullet.x < -bossBulletWidth &&
+          bullet.x > width
+        ){
+          let delBullet = bulletArr.splice(i, 1)[0];
+          Bullet.recoverBullet(delBullet);
+          continue;
+        }
+        this.drawImg('boss_bullet.jpg', bullet.x, bullet.y);
+        bullet.y += bullet.shiftY;
+        bullet.x += bullet.shiftX;
+        if(bullet.aX){
+          if(bullet.shiftX < 0){
+            bullet.shiftX -= bullet.aX;
+          }else{
+            bullet.shiftX += bullet.aX;
+          }
+        }
+        if(bullet.aY){
+          bullet.shiftY += bullet.aY;
+        }
+        if(
+          bullet.x + bossBulletWidth > player.x + 0.2*player.width &&
+          bullet.x < player.x + 0.8*player.width &&
+          bullet.y + bossBulletHeight > player.y + 0.2*player.height &&
+          bullet.y < player.y + 0.8*player.height &&
+          !player.dieFlag
+        ){
+          player.attacked(this.globalSrcBuffer);
+        }
+      }
     }
   }
 
@@ -692,6 +801,12 @@ let gameRun = function(){ //运行游戏真动画
   sendBoss(); //派发Boss
   if(ctrler.boss){
     renderBoss(); //渲染Boss
+    if(ctrler.boss.state !== 'Appear'){
+      if(!ctrler.boss.dieFlag){
+        sendBossBullet();        
+      }
+      renderBossBullet();
+    }
   }
   if(ctrler.boss && ctrler.boss.dieFlag){
     renderDieBoss();
