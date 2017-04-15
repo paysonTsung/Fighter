@@ -295,16 +295,16 @@ let {
 
 let startGame = (function(){ //启动游戏
   // console.log('game start');
+  this.globalSrcBuffer.soundPlay('music.mp3', {loop:true, replay:true});
+  this.bombBtn.style.display = 'block';
+  this.ctrlBtn.style.display = 'block';
+  this.controller = new Controller(); //启动游戏控制器
+
   let {
     enemyArr,
     dieArr,
     player
   } = this.controller;
-
-  this.globalSrcBuffer.soundPlay('music.mp3', {loop:true, replay:true});
-  this.bombBtn.style.display = 'block';
-  this.ctrlBtn.style.display = 'block';
-  this.controller = new Controller(); //启动游戏控制器
   
   player.bindTouchEvent(this.canvas);
   player.bindBombEvent(this.bombBtn, this.globalSrcBuffer, enemyArr, dieArr, this.controller);

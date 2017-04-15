@@ -5,7 +5,7 @@ import {FSM} from './FSM';
 
 
 /*** 版本 ***/
-let version = 'v1.3.4';
+let version = 'v1.3.5';
 
 /*** 语言转换策略 ***/
 let lanChangeStrategy = {
