@@ -5,7 +5,7 @@ import {FSM} from './FSM';
 
 
 /*** 版本 ***/
-let version = 'v1.3.3';
+let version = 'v1.3.4';
 
 /*** 语言转换策略 ***/
 let lanChangeStrategy = {
@@ -223,8 +223,14 @@ export default class UI {
       window.addEventListener('touchmove', (e) => {
         e.preventDefault();
       });
+      window.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+      });
     }
   }
+
+  /***** 游戏相关控制函数 *****/
+  
   
   init(){ //UI初始化
     this._preventDefault();

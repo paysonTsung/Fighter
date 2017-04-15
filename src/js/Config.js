@@ -58,7 +58,7 @@ export let config = {
   AIInterval: 500, // 智能敌机出现初始间隔/帧
   bulletInterval: 8, // 子弹发射间隔/帧
   firepowerTime: 2e4, // 火力全开持续时间/ms
-  showBossScore: 1e5, //出现boss的初始分数
+  showBossScore: 1e4, //出现boss的初始分数
   bossBlood: 200, //boss初始血量
   backgroundImgSrc: 'background.jpg',
   logoSrc: 'logo.png',
