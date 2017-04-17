@@ -4,7 +4,7 @@ import * as $ from './Utils';
 import {FSM} from './FSM';
 
 /*** 版本 ***/
-let version = 'v2.0.0';
+let version = 'v2.0.1';
 
 /*** 语言转换 ***/
 let lanChangeStrategy = {
@@ -219,10 +219,10 @@ export default class UI {
 
   _preventDefault(){ //阻止浏览器默认事件
     if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
-      window.addEventListener('touchmove', (e) => {
+      this.canvas.addEventListener('touchmove', (e) => {
         e.preventDefault();
       });
-      window.addEventListener('touchstart', (e) => {
+      this.canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
       });
     }
