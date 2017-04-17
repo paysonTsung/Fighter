@@ -1,4 +1,5 @@
 import {config} from './Config';
+import {playerBulletStrategy} from './Strategy';
 import BossBullet from './BossBullet';
 import Plane from './Plane';
 import UI from './UI';
@@ -18,11 +19,42 @@ export default class Player extends Plane {
     this.dieFlag = false; //死亡flag
     this.dieLen = config.dieImgNum.player; //死亡图片数
   }
-  attacked(srcBuffer){
+
+  render(ui){
+    let {canvas} = ui;
+    let {frame} = ui.controller;
+    let {canvasHeight, canvasWidth} = config;
+    if(!this.dieFlag){
+      ui.drawImg(`player${this.playerIndex}.png`, this.x, this.y);
+      if(frame.counter % 5 === 0){
+        this.playerIndex = Number(!this.playerIndex);
+      }
+    }else{
+      if(this.countDown === 0){
+        ui.controller.trigger('gameover', ui);
+        return true;
+      }else{
+        let dieIndex = Math.floor(this.dieLen - this.countDown / 10);      
+        ui.drawImg(`player_die${dieIndex}.png`, this.x, this.y);
+      }
+      this.countDown--;
+    }
+  }
+
+  sendBullet(frame, bulletArr, soundPlay){
+    let {bulletSpeed, bulletInterval} = config;
+    if(frame.counter % bulletInterval === 0){
+      playerBulletStrategy[`Lv.${this.weaponLevel}`](this, bulletSpeed, bulletArr);
+      soundPlay('biubiubiu.mp3');
+    }
+  };
+
+  attacked(soundPlay){
     this.dieFlag = true;
     this.countDown = this.dieLen * config.dieInterval;
-    srcBuffer.soundPlay('player_bomb.mp3');
+    soundPlay('player_bomb.mp3');
   }
+
   bindTouchEvent(dom){ //绑定移动事件
     let planeBoundaryMinX = 0;
     let planeBoundaryMaxX = config.canvasWidth -  config.playerWidth;
@@ -58,6 +90,7 @@ export default class Player extends Plane {
       });
     });
   }
+
   bindBombEvent(dom, srcBuffer, enemyArr, dieArr, ctrler){ //绑定爆炸事件
     dom.addEventListener('touchend', (e) => {
       if(this.bomb){
@@ -69,7 +102,7 @@ export default class Player extends Plane {
           dieEnemy.dieLen = dieLen;
           dieEnemy.countDown = dieLen * config.dieInterval;
           dieArr.push(dieEnemy);
-          this.score += config.score[dieEnemy.type];
+          this.score += config.killScore[dieEnemy.type];
           srcBuffer.soundPlay('use_bomb.mp3');
         }
         let {boss} = ctrler;

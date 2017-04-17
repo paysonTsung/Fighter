@@ -3,4 +3,6 @@ export default class Plane{
     this.x = -999;
     this.y = -999;
   }
+
+  render(){};
 }

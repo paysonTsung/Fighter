@@ -1,13 +1,10 @@
-import {getStyle, getID, getClass, createObjPool, randomNum, firstLower} from './Utils';
+import {config} from './Config';
+import {getClass, installEvent} from './Utils';
 import {lanStrategy} from './Language';
 import Controller from './Controller';
 import BossBullet from './BossBullet';
-import {config} from './Config';
-import Bullet from './Bullet';
+import PlayerBullet from './PlayerBullet';
 import Enemy from './Enemy';
-import Prop from './Prop';
-import Boss from './Boss';
-
 
 /******** 状态改变工厂 ********/
 let changeUIState = function(type, ui){
@@ -72,233 +69,16 @@ let againGame = (function(){ //重新游戏
 });
 
 
-/******** 玩家弹幕策略对象 ********/
-let playerBulletStrategy = {
-  'Lv.0': function(player, bulletSpeed, bulletArr){
-    let newBullet = Bullet.getBullet(player.x + player.width/2 - 3, player.y, 0, -bulletSpeed, 'normal', 1);
-    bulletArr.push(newBullet);
-  },
-  'Lv.1': function(player, bulletSpeed, bulletArr){
-    let newLeftBullet = Bullet.getBullet(player.x + player.width/2 - 20, player.y, 0, -bulletSpeed,  'normal', 1);
-    let newRightBullet = Bullet.getBullet(player.x + player.width/2 + 14, player.y, 0, -bulletSpeed,  'normal', 1);
-    bulletArr.push(newLeftBullet, newRightBullet);
-  },
-  'Lv.2': function(player, bulletSpeed, bulletArr){
-    let newLeftBullet = Bullet.getBullet(player.x + player.width/2 - 38, player.y + 20, -bulletSpeed/3, -bulletSpeed,  'strength', 1);
-    let newMidBullet = Bullet.getBullet(player.x + player.width/2 - 3, player.y, 0, -bulletSpeed,  'normal', 1);
-    let newRightBullet = Bullet.getBullet(player.x + player.width/2 + 30, player.y + 20, bulletSpeed/3, -bulletSpeed,  'strength', 1);
-    bulletArr.push(newLeftBullet, newMidBullet, newRightBullet);
-  },
-  'Lv.3': function(player, bulletSpeed, bulletArr){
-    let newLeftBullet = Bullet.getBullet(player.x + player.width/2 - 38, player.y + 20, -bulletSpeed/3, -bulletSpeed,  'strength', 1);
-    let newMidLeftBullet = Bullet.getBullet(player.x + player.width/2 - 20, player.y, 0, -bulletSpeed,  'normal', 1);
-    let newMidRightBullet = Bullet.getBullet(player.x + player.width/2 + 14, player.y, 0, -bulletSpeed,  'normal', 1);
-    let newRightBullet = Bullet.getBullet(player.x + player.width/2 + 30, player.y + 20, bulletSpeed/3, -bulletSpeed,  'strength', 1);
-    bulletArr.push(newLeftBullet, newMidLeftBullet, newMidRightBullet, newRightBullet);
-  },
-  'Lv.4': function(player, bulletSpeed, bulletArr){
-    let newLeftBullet = Bullet.getBullet(player.x + player.width/2 - 38, player.y + 20, -bulletSpeed/3, -bulletSpeed,  'strength', 1);
-    let newMidLeftBullet = Bullet.getBullet(player.x + player.width/2 - 20, player.y, -bulletSpeed/4, -bulletSpeed,  'normal', 1);
-    let newMidBullet = Bullet.getBullet(player.x + player.width/2 - 3, player.y, 0, -bulletSpeed,  'super', 2);
-    let newMidRightBullet = Bullet.getBullet(player.x + player.width/2 + 14, player.y, bulletSpeed/4, -bulletSpeed,  'normal', 1);
-    let newRightBullet = Bullet.getBullet(player.x + player.width/2 + 30, player.y + 20, bulletSpeed/3, -bulletSpeed,  'strength', 1);
-    bulletArr.push(newLeftBullet, newMidLeftBullet, newMidBullet, newMidRightBullet, newRightBullet);
-  }
-};
-
-/******** 道具策略对象 ********/
-let propStrategy = {
-  'bomb': function(player){
-    let bombNum = player.bomb;
-    if(bombNum < config.bombMax){
-      player.bomb = bombNum + 1;      
-    }
-  },
-  'weapon': (function(){
-    let upperLimit = Object.keys(playerBulletStrategy).length;
-    return function(player){
-      let {weaponLevel} = player;
-      if(weaponLevel < Object.keys(playerBulletStrategy).length - 1){
-        player.weaponLevel = weaponLevel + 1;
-      }
-      if(!player.isFullFirepower){
-        player.isFullFirepower = true;
-      }else{
-        clearTimeout(player.firepowerTimer);
-      }
-      player.firepowerTimer = setTimeout(function(){
-        player.isFullFirepower = false;
-        player.weaponLevel = 0;
-      }, config.firepowerTime);
-    }
-  })()
-};
-
-/******** 智能AI策略对象 ********/
-let AIStrategy = {
-  'AI-I': function(ctrler){ //横飞智能机
-    let {smallPlaneHeight, canvasHeight, canvasWidth} = config;
-    let {gameLevel, enemyArr} = ctrler;
-    let randomY = randomNum(100, canvasHeight - config['smallPlaneWidth'] - 100);
-    let cnt = 0;
-    ctrler.AITimer = setInterval(() => {
-      if(cnt === 8 + gameLevel){
-        clearInterval(ctrler.AITimer);
-      }
-      let newEnemy1 = Enemy.getEnemy(
-        -smallPlaneHeight, 
-        randomY - 80,
-        'smallPlane',
-        4 + 0.2*gameLevel,
-        0,
-        true,
-        'right'
-      );
-      let newEnemy2 = Enemy.getEnemy(
-        canvasWidth, 
-        randomY,
-        'smallPlane',
-        -4 - 0.2*gameLevel,
-        0,
-        true,
-        'left'
-      );
-      let newEnemy3 = Enemy.getEnemy(
-        -smallPlaneHeight, 
-        randomY + 80,
-        'smallPlane',
-        4 + 0.2*gameLevel,
-        0,
-        true,
-        'right'
-      );
-      enemyArr.push(newEnemy1, newEnemy2, newEnemy3);
-      cnt++;
-    }, 300);
-  },
-  'AI-II': function(ctrler){ //锁敌智能机
-    let {smallPlaneWidth, smallPlaneHeight, canvasWidth} = config;
-    let {gameLevel, enemyArr, player} = ctrler;
-    let cnt = 0;
-    ctrler.AITimer = setInterval(() => {
-      if(cnt === 8 + gameLevel){
-        clearInterval(ctrler.AITimer);
-      }
-      let newEnemy1 = Enemy.getEnemy(
-        -smallPlaneWidth,
-        -smallPlaneHeight,
-        'smallPlane',
-        (player.x + player.width/2) / 90,
-        (player.y + player.height/2) / 90,
-        true
-      );
-      let newEnemy2 = Enemy.getEnemy(
-        canvasWidth,
-        -smallPlaneHeight,
-        'smallPlane',
-        (player.width/2 -(canvasWidth - player.x)) / 90,
-        (player.y + player.height/2) / 90,
-        true
-      );
-      enemyArr.push(newEnemy1, newEnemy2);
-      cnt++;
-    }, 300);
-  },
-  'AI-III': function(ctrler){ //并飞智能机
-    let {mediumPlaneWidth, mediumPlaneHeight, canvasWidth} = config;
-    let {gameLevel, enemyArr} = ctrler;
-    let cnt = 0;
-    let randomX = randomNum(0, canvasWidth/2 - mediumPlaneWidth);
-    ctrler.AITimer = setInterval(() => {
-      if(cnt === 7 + gameLevel){
-        clearInterval(ctrler.AITimer);
-      }
-      let newEnemy1 = Enemy.getEnemy(
-        randomX,
-        -mediumPlaneHeight,
-        'mediumPlane',
-        0,
-        3 + 0.2*gameLevel,
-        true
-      );
-      let newEnemy2 = Enemy.getEnemy(
-        canvasWidth - randomX - mediumPlaneWidth,
-        -mediumPlaneHeight,
-        'mediumPlane',
-        0,
-        3 + 0.2*gameLevel,
-        true
-      );
-      enemyArr.push(newEnemy1, newEnemy2);
-      cnt++;
-    }, 500);
-  }
-};
-
-/******** Boss弹幕策略对象 ********/
-let bossBulletStrategy = {
-  '1': function(boss, fireX, fireY, gameLevel, ratio){ //直线弹幕
-    if(boss.showTime % 10 === 0){
-      let newBullet = BossBullet.getBullet(fireX, fireY, 0, 7 + 0.5*gameLevel);
-      boss.bullets.push(newBullet);
-    }
-  },
-  '2': function(boss, fireX, fireY, gameLevel, ratio){ //锁定弹幕
-    if(boss.showTime % 25 === 0){
-      let newBullet = BossBullet.getBullet(fireX, fireY, (6 + 0.2*gameLevel) * ratio, 6 + 0.2*gameLevel);
-      boss.bullets.push(newBullet);
-    }
-  },
-  '3': function(boss, fireX, fireY, gameLevel, ratio){ //散弹弹幕
-    if(boss.showTime % 20 === 0){
-      let newBullet = BossBullet.getBullet(fireX, fireY, 0, 8 + 0.2*gameLevel);
-      let newLeftBullet = BossBullet.getBullet(fireX, fireY, -4, 6 + 0.2*gameLevel);
-      let newRightBullet = BossBullet.getBullet(fireX, fireY, 4, 6 + 0.2*gameLevel);
-      boss.bullets.push(newBullet, newLeftBullet, newRightBullet);
-    }
-  },
-  '4': function(boss, fireX, fireY, gameLevel, ratio){ //横弹幕
-    if(boss.showTime % 33 === 0){
-      let newBullet = BossBullet.getBullet(fireX - 60, fireY, 3 * ratio, 3);
-      let newLeftBullet = BossBullet.getBullet(fireX, fireY, 3 * ratio, 3);
-      let newRightBullet = BossBullet.getBullet(fireX + 60, fireY, 3 * ratio, 3);
-      boss.bullets.push(newBullet, newLeftBullet, newRightBullet);
-    }
-  },
-  '5': function(boss, fireX, fireY, gameLevel, ratio){ //加速弹幕
-    if(boss.showTime % 33 === 0){
-      let newBullet = BossBullet.getBullet(fireX - 120, fireY - 30, -1, 1, 0, 0.3 + 0.01*gameLevel);
-      let newLeftBullet = BossBullet.getBullet(fireX, fireY, 0, 1, 0, 0.3 + 0.01*gameLevel);
-      let newRightBullet = BossBullet.getBullet(fireX + 120, fireY - 30, 1, 1, 0, 0.3 + 0.01*gameLevel);
-      boss.bullets.push(newBullet, newLeftBullet, newRightBullet);
-    }
-  }
-}
-
-let {
-  dieInterval,
-  propInterval,
-  bulletInterval,
-  propWidth,
-  propHeight,
-  bombWidth,
-  bombHeight,
-  buttonWidth,
-  buttonHeight,
-  bossWidth,
-  bossHeight,
-  bossBulletWidth,
-  bossBulletHeight,
-  score
-} = config;
-
-
-let startGame = (function(){ //启动游戏
+/******* 启动游戏 *******/
+let startGame = (function(){
   // console.log('game start');
   this.globalSrcBuffer.soundPlay('music.mp3', {loop:true, replay:true});
   this.bombBtn.style.display = 'block';
   this.ctrlBtn.style.display = 'block';
   this.controller = new Controller(); //启动游戏控制器
+  
+  installEvent(this.controller);
+  this.controller.init();
 
   let {
     enemyArr,
@@ -318,436 +98,64 @@ let startGame = (function(){ //启动游戏
   this.curState = 'IN_GAME_UI';
 });
 
-let gameRun = function(){ //运行游戏帧动画
-  let canvas = this.canvas;
-  let {width, height} = canvas;
+
+/******* 运行游戏帧动画*******/
+let gameRun = function(){
   let ctrler = this.controller;
+  let ui = this;
+  let gSrc = this.globalSrcBuffer;
   let {
+    background,
     player,
-    bulletArr,
-    enemyArr,
-    dieArr,
+    prop,
+    boss,
     frame,
-    back,
-    gameLevel
+    bulletArr
   } = ctrler;
 
+  let soundPlay = gSrc.soundPlay.bind(gSrc);
+  let drawBack = this.drawBackground.bind(this);
+  let draw = this.drawImg.bind(this);
+
   frame.counter++;
+ 
+  background.scroll(drawBack); //滚动背景
 
-  let backScroll = () => {
-    back.y1 = (back.y1 === height) ? -height : (back.y1 + 1);
-    back.y2 = (back.y2 === height) ? -height : (back.y2 + 1);
-    this.drawBackground(back.y1);
-    this.drawBackground(back.y2);
-  };
+  player.sendBullet(frame, bulletArr, soundPlay); //玩家发射子弹
+  PlayerBullet.render(ctrler, draw, soundPlay); //渲染玩家子弹
 
-  let renderPlayer = () => {
-    if(!player.dieFlag){
-      this.drawImg(`player${player.playerIndex}.png`, player.x, player.y);
-      if(frame.counter % 5 === 0){
-        player.playerIndex = Number(!player.playerIndex);
-      }
-    }else{
-      if(player.countDown === 0){
-        this.curState = 'GAME_OVER_UI';
-        this.drawImg('game_over.png', 0, 0);
-        this.bombBtn.style.display = 'none';
-        this.ctrlBtn.style.display = 'none';
-
-        this.globalSrcBuffer.soundPlay('achievement.mp3');
-
-        this.ctx.font = '50px sans-serif';
-        let textWidth = this.ctx.measureText(player.score).width;
-        this.ctx.fillText(player.score, (width - textWidth) / 2, height / 2);
-        if(!sessionStorage.fighterScore){
-          sessionStorage.fighterScore = '[]';
-        }
-        let db = JSON.parse(sessionStorage.fighterScore);
-        db.push(player.score);
-        db = db.sort(function(a, b){
-          return b - a;
-        });
-        sessionStorage.fighterScore = JSON.stringify(db);
-
-        let touchScreen = () => {
-          this.globalSrcBuffer.soundPause('music.mp3');
-          this.drawBackground();
-          this.drawLogo();
-          this.setBtnText(this.language);
-          this.btnGroup.style.display = 'block';
-          this.curState = 'MAIN_UI';
-          canvas.removeEventListener('touchstart', touchScreen);
-        }
-
-        setTimeout(() => {
-          canvas.addEventListener('touchstart', touchScreen);
-        }, 1000);
-        
-        return true;
-      }else{
-        let dieIndex = Math.floor(player.dieLen - player.countDown / 10);      
-        this.drawImg(`player_die${dieIndex}.png`, player.x, player.y);
-      }
-      player.countDown--;
-    }
-  };
-
-  let sendBullet = () => {
-    let {bulletSpeed} = config;
-    if(frame.counter % bulletInterval === 0){
-      playerBulletStrategy[`Lv.${player.weaponLevel}`](player, bulletSpeed, bulletArr);
-      this.globalSrcBuffer.soundPlay('biubiubiu.mp3');
-    }
-  };
-
-  let renderBullet = () => {
-     outer: for(let i = bulletArr.length; i--;){
-      let bullet = bulletArr[i];
-      if(bullet.y < -config.bulletHeight){
-        let delBullet = bulletArr.splice(i, 1)[0];
-        Bullet.recoverBullet(delBullet);
-        continue;
-      }
-      this.drawImg(`bullet_${bullet.type}.png`, bullet.x, bullet.y);
-      bullet.y += bullet.shiftY;
-      if(bullet.shiftX){
-        bullet.x += bullet.shiftX;
-      }
-      for(let j = enemyArr.length; j--;){
-        let enemy = enemyArr[j];
-        if(bullet.x + config.bulletWidth > enemy.x &&
-          bullet.x < enemy.x + config[`${enemy.type}Width`] &&
-          bullet.y + config.bulletHeight > enemy.y &&
-          bullet.y < enemy.y + config[`${enemy.type}Height`]
-        ){
-          let delBullet = bulletArr.splice(i, 1)[0];
-          Bullet.recoverBullet(delBullet);
-          enemy.blood -= delBullet.damage;
-          if(enemy.blood <= 0){
-            let dieEnemy = enemyArr.splice(j, 1)[0];
-            let dieLen = config.dieImgNum[dieEnemy.type];
-            dieEnemy.dieLen = dieLen;
-            dieEnemy.countDown = dieLen * dieInterval;
-            dieArr.push(dieEnemy);
-            if(dieEnemy.isAI){
-              player.score += 2 * score[dieEnemy.type];
-            }else{
-              player.score += score[dieEnemy.type];
-            }
-            this.globalSrcBuffer.soundPlay(`${dieEnemy.type}_die.mp3`);
-          }
-          break outer;
-        }
-      }
-      let {boss} = ctrler;
-      if(boss && boss.state !== 'Appear' && !boss.dieFlag &&
-        bullet.x + config.bulletWidth > boss.x &&
-        bullet.x < boss.x + config.bossWidth &&
-        bullet.y + config.bulletHeight > boss.y &&
-        bullet.y < boss.y + config.bossHeight
-      ){
-        let delBullet = bulletArr.splice(i, 1)[0];
-        Bullet.recoverBullet(delBullet);
-        player.score += (delBullet.damage * 7);
-        boss.attacked(delBullet.damage, ctrler);
-      }
-    }
-  };
-
-  let sendEnemy = () => {
-    let enemyInterval = (ctrler.enemyInterval - gameLevel * 2);
-    if(enemyInterval < 20){
-      enemyInterval = 20;
-    }
-    if(frame.counter % enemyInterval === 0){
-      let planeType = ctrler.randomPlane();
-      let newEnemy = Enemy.getEnemy(
-        randomNum(0, width - config[`${planeType}Width`]), 
-        -config[`${planeType}Height`],
-        planeType
-      );
-      if(planeType === 'largePlane'){
-        newEnemy.imgIndex = 0;
-        this.globalSrcBuffer.soundPlay('largePlane_flying.mp3');
-      }
-      enemyArr.push(newEnemy);
-    }
-  };
-
-  let sendAIEnemey = () => {
-    if(frame.counter % ctrler.AIInterval === 0){
-      let AI = ctrler.randomAI();
-      AIStrategy[AI](ctrler);
-    }
-  };
-
-  let renderEnemy = () => {
-    for(let i = enemyArr.length; i--;){
-      let enemy = enemyArr[i];
-      let {type, dir} = enemy;
-      let enemyHeight = config[`${type}Height`];
-      let enemyWidth = config[`${type}Width`];
-      if(enemy.y > height + enemyHeight || enemy.x < -300 || enemy.x > width + 300){
-        let del = enemyArr.splice(i, 1)[0];
-        Enemy.recoverEnemy(del);
-        continue;
-      }
-      if(type === 'largePlane'){
-        if(frame.counter % 7 === 0){
-          enemy.imgIndex = Number(!enemy.imgIndex);
-        }
-        if(enemy.blood < config.planeBlood.largePlane / 2 && enemy.imgIndex == 1){
-          this.drawImg('largePlane_hurt.png', enemy.x, enemy.y);
-        }else{
-          this.drawImg(`${type}${enemy.imgIndex}.png`, enemy.x, enemy.y);
-        }
-      }else{
-        if(type === 'mediumPlane' && enemy.blood < config.planeBlood.mediumPlane / 2){
-          this.drawImg('mediumPlane_hurt.png', enemy.x, enemy.y);
-        }
-        if(dir){
-          this.drawImg(`${type}_${dir}.png`, enemy.x, enemy.y);
-        }else{
-          this.drawImg(`${type}.png`, enemy.x, enemy.y);
-        }
-      }
-      if(
-        enemy.x + 0.8*enemyWidth > player.x + 0.1*player.width &&
-        enemy.x + 0.2*enemyWidth < player.x + 0.9*player.width &&
-        enemy.y + 0.8*enemyHeight > player.y + 0.1*player.height &&
-        enemy.y + 0.2*enemyHeight < player.y + 0.9*player.height &&
-        !player.dieFlag
-      ){
-        player.attacked(this.globalSrcBuffer);
-      }
-      enemy.y += enemy.shiftY;
-      enemy.x += enemy.shiftX;
-      if(!enemy.isAI){
-        enemy.y += config.grow[enemy.type]*gameLevel
-      }
-    }
-  };
-
-  let renderDieEnemy = () => {
-    for(let i = dieArr.length; i--;){
-      let diePlane = dieArr[i];
-      if(diePlane.countDown === 0){
-        let delEnemy = dieArr.splice(i, 1)[0];
-        Enemy.recoverEnemy(delEnemy);
-      }else{
-        let dieIndex = Math.floor(diePlane.dieLen - diePlane.countDown / 10);
-        if(diePlane.dir){
-          this.drawImg(`${diePlane.type}_${diePlane.dir}_die${dieIndex}.png`, diePlane.x, diePlane.y);
-        }else{
-          this.drawImg(`${diePlane.type}_die${dieIndex}.png`, diePlane.x, diePlane.y);
-        }
-      }
-      diePlane.countDown--;
-    }
-  };
-
-  let sendBoss = () => {
-    if(player.score > ctrler.showBossScore){
-      ctrler.showBossScore += config.showBossScore;
-      this.globalSrcBuffer.soundPlay('warning.mp3');
-      if(!ctrler.boss){
-        ctrler.boss = new Boss(ctrler.gameLevel);
-      }
-    }
-  };
-
-  let renderBoss = () => {
-    let {boss} = ctrler;
-    let {ctx} = this;
-    let bossText = `Lv.${boss.level} Boss`;
-    let textWidth = ctx.measureText(bossText).width; 
-    let {blood, maxBlood, x, y} = boss;
-    let bloodBarWidth = bossWidth * 0.8;
-    let bloodBarHeight = 14;
-    let bloodBarPosX = x + bossWidth*0.1;
-    let bloodBarPosY = y - 20;
-    let bossState = firstLower(boss.state);
-    if(boss.showTime && !boss.dieFlag){
-      this.drawImg('boss_angry.png', x, y);
-    }else{
-      this.drawImg(`boss_${bossState}.png`, x, y);
-    }
-    ctx.strokeStyle = 'black';
-    ctx.strokeRect(bloodBarPosX, bloodBarPosY, bloodBarWidth, bloodBarHeight);
-    ctx.fillStyle = 'red';
-    if(blood < 0){
-      blood = 0;
-    }
-    ctx.fillRect(bloodBarPosX, bloodBarPosY, bloodBarWidth * (blood / maxBlood), bloodBarHeight);
-    ctx.font = '24px sans-serif';
-    ctx.fillStyle = 'black';
-    ctx.fillText(bossText, x + (bossWidth - textWidth)/2 + 28, y - 24);
-    boss.move();
-    if(
-      boss.x + 0.9*bossWidth > player.x &&
-      boss.x + 0.1*bossWidth < player.x + player.width &&
-      boss.y + 0.9*bossHeight > player.y &&
-      boss.y + 0.1*bossHeight < player.y + player.height &&
-      !player.dieFlag
-    ){
-      player.attacked(this.globalSrcBuffer);
-    }
-  };
-
-  let sendBossBullet = () => {
-    let {boss} = ctrler;
-    if(frame.counter % 200 === 0 || boss.showTime !== 0){
-      if(!boss.showTime){
-        boss.showTime = 100;
-        boss.curBullet = randomNum(1, 6);
-      }
-      let fireX = boss.x + bossWidth / 2;
-      let fireY = boss.y + bossHeight;
-      let ratio = (player.x + player.width/2 - fireX) / (player.y + player.height/2 - fireY);
-
-      bossBulletStrategy[boss.curBullet](boss, fireX, fireY, gameLevel, ratio);
-
-      boss.showTime--;
-    }
-  };
-
-  let renderBossBullet = () => {
-    let {bullets} = ctrler.boss;
-    if(bullets.length !== 0){
-       for(let i = bullets.length; i--;){
-        let bullet = bullets[i];
-        if(bullet.y > height && 
-          bullet.y < -bossBulletHeight && 
-          bullet.x < -bossBulletWidth &&
-          bullet.x > width
-        ){
-          let delBullet = bulletArr.splice(i, 1)[0];
-          Bullet.recoverBullet(delBullet);
-          continue;
-        }
-        this.drawImg('boss_bullet.jpg', bullet.x, bullet.y);
-        bullet.y += bullet.shiftY;
-        bullet.x += bullet.shiftX;
-        if(bullet.aX){
-          if(bullet.shiftX < 0){
-            bullet.shiftX -= bullet.aX;
-          }else{
-            bullet.shiftX += bullet.aX;
-          }
-        }
-        if(bullet.aY){
-          bullet.shiftY += bullet.aY;
-        }
-        if(
-          bullet.x + bossBulletWidth > player.x + 0.2*player.width &&
-          bullet.x < player.x + 0.8*player.width &&
-          bullet.y + bossBulletHeight > player.y + 0.2*player.height &&
-          bullet.y < player.y + 0.8*player.height &&
-          !player.dieFlag
-        ){
-          player.attacked(this.globalSrcBuffer);
-        }
-      }
-    }
-  };
-
-  let renderDieBoss = () => {
-    let {boss} = ctrler;
-    this.drawImg('boss_die.png', boss.x, boss.y);
-    boss.countDown--;
-    if(boss.countDown === 0){
-      ctrler.boss = null;
-    }
-  };
-
-  let sendProps = () => {
-    if(frame.counter % propInterval === 0){
-      let propType = ctrler.randomProp();
-      this.globalSrcBuffer.soundPlay('prop_appear.mp3');
-      ctrler.curProp = Prop.getProp(
-        randomNum(0, width - config.propWidth), 
-        -config.propHeight,
-        propType
-      );
-    }
-  };
-
-  let renderProps = () => {
-    if(ctrler.curProp){
-      this.drawImg(`prop_${ctrler.curProp.type}.png`, ctrler.curProp.x, ctrler.curProp.y);
-      ctrler.curProp.y += config.propSpeed;
-      if(
-        player.x < ctrler.curProp.x + propWidth &&
-        player.x + player.width > ctrler.curProp.x &&
-        player.y < ctrler.curProp.y + propHeight &&
-        player.y + player.height > ctrler.curProp.y
-      ){
-        propStrategy[ctrler.curProp.type](player);
-        this.globalSrcBuffer.soundPlay(`get_${ctrler.curProp.type}_prop.mp3`);
-        Prop.recoverProp(ctrler.curProp);
-        ctrler.curProp = null;
-      }else if(ctrler.curProp.y > height + propHeight){
-        Prop.recoverProp(ctrler.curProp);
-        ctrler.curProp = null;
-      }
-    }
-  };
-
-  let renderBomb = () => {
-    if(player.bomb){
-      this.drawImg('bomb.png', 10, height - bombHeight - 10);
-      this.ctx.font = '30px sans-serif';
-      this.ctx.fillStyle = 'black';
-      this.ctx.fillText(`× ${player.bomb}`, bombWidth + 20, height - bombHeight / 2);
-    }
-  };
-
-  let renderScore = () => {
-    if(player.score){
-      this.ctx.font = '34px sans-serif';
-      this.ctx.fillStyle = 'black';
-      this.ctx.fillText(`${lanStrategy[this.language].score}：${player.score}`, 70, 40);
-    }
-  };
-
-  let renderCtrl = () => {
-    if(!ctrler.isPaused){
-      this.drawImg('game_pause.png', 0, 5);
-    }else{
-      this.drawImg('game_resume.png', 0, 5);
-    }
-  };
-
-  backScroll(); //滚动背景
-  sendBullet(); //发放子弹
-  renderBullet(); //渲染子弹
-  if(!ctrler.boss){
-    sendEnemy(); //派发敌机
-    sendAIEnemey(); //派发智能机群
+  if(!boss){
+    ctrler.sendEnemy(soundPlay); //派发敌机
+    ctrler.sendAIEnemey(); //派发智能机群
   }
-  renderEnemy(); //渲染敌机
-  renderDieEnemy(); //渲染爆炸敌机
-  sendBoss(); //派发Boss
-  if(ctrler.boss){
-    renderBoss(); //渲染Boss
-    if(ctrler.boss.state !== 'Appear'){
-      if(!ctrler.boss.dieFlag){
-        sendBossBullet();        
+  
+  Enemy.render(ctrler, draw, soundPlay); //渲染敌机
+  Enemy.renderDie(ctrler, draw); //渲染爆炸敌机
+
+  ctrler.sendBoss(soundPlay); //派发Boss
+
+  if(boss){
+    boss.render(this.ctx, player, draw, soundPlay); //渲染Boss
+    if(boss.state !== 'Appear'){
+      if(!boss.dieFlag){
+        boss.sendBullet(ctrler); //Boss发射子弹
       }
-      renderBossBullet();
+      BossBullet.render(player, boss, bulletArr, draw, soundPlay); //渲染Boss子弹
     }
   }
-  if(ctrler.boss && ctrler.boss.dieFlag){
-    renderDieBoss();
+  if(boss && boss.dieFlag){
+    boss.renderDie(ctrler, draw); //渲染挂掉的Boss
   }
-  if(renderPlayer()){ //渲染玩家飞机
-    return;//终止
+
+  if(player.render(this)){ //渲染玩家飞机
+    return; //终止游戏
   }
-  sendProps(); //发放道具
-  renderProps(); //渲染道具
-  renderBomb(); //渲染炸弹
-  renderScore(); //渲染分数
-  renderCtrl(); //渲染控制按钮
+
+  ctrler.sendProps(frame, soundPlay); //发放道具
+  prop && prop.render(ctrler, draw, soundPlay); //渲染道具
+  player.bomb && ctrler.renderBomb(this.ctx, player, draw); //渲染炸弹
+  player.score && ctrler.renderScore(this.ctx, player, this.language); //渲染分数
+  ctrler.renderCtrl(draw); //渲染控制按钮
   
   if(this.curState === 'IN_GAME_UI'){
     requestAnimationFrame(gameRun.bind(this));      

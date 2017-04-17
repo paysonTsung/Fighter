@@ -1,13 +1,12 @@
-import {lanStrategy} from './Language';
 import {config} from './Config';
+import {lanStrategy} from './Language';
 import * as $ from './Utils';
 import {FSM} from './FSM';
 
-
 /*** 版本 ***/
-let version = 'v1.3.5';
+let version = 'v1.3.6';
 
-/*** 语言转换策略 ***/
+/*** 语言转换 ***/
 let lanChangeStrategy = {
   '中文': 'chinese',
   'English': 'english'
@@ -15,7 +14,7 @@ let lanChangeStrategy = {
 
 export default class UI {
   constructor(paramObj){
-    this.curState = 'MAIN_UI'; //状态
+    this.curState = 'MAIN_UI'; //UI状态
     this.controller = null; //游戏控制器
     this.score = null; //分数
     this.loaded = false; //加载状态
@@ -228,8 +227,6 @@ export default class UI {
       });
     }
   }
-
-  /***** 游戏相关控制函数 *****/
   
   
   init(){ //UI初始化

@@ -1,20 +1,36 @@
-import {createObjPool} from './Utils';
-let propPool = createObjPool(() => {
-  return new Prop();
-});
+import {config} from './Config';
+import {createObjPool, randomNum} from './Utils';
+import {propStrategy} from './Strategy';
 export default class Prop{
-  constructor(x = -999, y = -999){
-    this.x = x;
-    this.y = y;
+  constructor(type){
+    let {canvasWidth, propWidth, propHeight} = config;
+    this.x = randomNum(0, canvasWidth - propWidth);
+    this.y = -propHeight;
+    this.type = type;
   }
-  static getProp(x, y, type){
-    let prop = propPool.get();
-    prop.x = x;
-    prop.y = y;
-    prop.type = type;
-    return prop;
+
+  _judgeBumpPlayer(player, ctrler, soundPlay){
+    let {propWidth, propHeight} = config;
+    if(
+      player.x < this.x + propWidth &&
+      player.x + player.width > this.x &&
+      player.y < this.y + propHeight &&
+      player.y + player.height > this.y
+    ){
+      propStrategy[this.type](player);
+      soundPlay(`get_${this.type}_prop.mp3`);
+      ctrler.prop = null;
+    }
   }
-  static recoverProp(propObj){
-    return propPool.recover(propObj);
+
+  render(ctrler, draw, soundPlay){
+    let {propSpeed, propWidth, propHeight, canvasHeight} = config;
+    let {player} = ctrler;
+    draw(`prop_${this.type}.png`, this.x, this.y);
+    this.y += propSpeed;
+    if(this.y > canvasHeight + propHeight){
+      ctrler.prop = null;
+    }
+    this._judgeBumpPlayer(player, ctrler, soundPlay);
   }
 }

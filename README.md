@@ -12,9 +12,11 @@ By Payen S.Tsung
  - ES6 类、模块、解构赋值、模板字符串...
  - HTML5 画布 Canvas
  - HTML5 媒体 Media
+ - HTML5 动画 requestAnimationFrame
  - HTML5 客户端本地存储 sessionStorage
  - 装饰者模式：面向切面AOP
  - 状态模式：状态机
+ - 发布-订阅模式/观察者模式
  - 策略模式
  - 资源预加载
  - 对象池技术

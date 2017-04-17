@@ -43,6 +43,41 @@ var createObjPool = function(createObjFn){ //对象池工厂
     // }
   }
 };
+var installEvent = function(obj){ // 发布-订阅模式/观察者模式
+  obj.eventList = [];
+  obj.listen = function(key, fn){
+    if(!this.eventList[key]){
+      this.eventList[key] = [];
+    }
+    this.eventList[key].push(fn);
+  };
+  obj.trigger = function(){
+    var key = Array.prototype.shift.call(arguments);
+    var fns = this.eventList[key];
+    if(!fns || fns.length === 0){
+      return false;
+    }
+    for(var i = 0, fn; fn = fns[i++];){
+      fn.apply(this, arguments);
+    }
+  };
+  obj.remove = function(key, fn){
+    var fns = this.eventList[key];
+    if(!fns){
+      return false;
+    }
+    if(!fn){
+      fns && (fns.length = 0);
+    }else{
+      for(var i = fns.length - 1; i >= 0; i--){
+        var _fn = fns[l];
+        if(_fn === fn){
+          fns.splice(i, 1);
+        }
+      }
+    }
+  }
+};
 var randomNum = function(min, max){
   return Math.floor(min + Math.random() * (max - min));
 }
@@ -70,5 +105,6 @@ export {
   removeDOM,
   getStyle,
   createObjPool,
+  installEvent,
   randomNum
 }

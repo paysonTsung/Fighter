@@ -42,7 +42,7 @@ export let config = {
     mediumPlane: 4,
     largePlane: 6
   },
-  score: {
+  killScore: {
     smallPlane: 100,
     mediumPlane: 1200,
     largePlane: 3500
@@ -52,10 +52,10 @@ export let config = {
     mediumPlane: 0.2,
     largePlane: 0.1
   },
-  dieInterval: 10, // 玩家/敌机死亡动画间隔/帧
-  propInterval: 400, // 道具发放间隔/帧
-  enemyInterval: 40, // 敌机出现初始间隔/帧
-  AIInterval: 500, // 智能敌机出现初始间隔/帧
+  dieInterval: 10, //玩家/敌机死亡动画间隔/帧
+  propInterval: 400, //道具发放间隔/帧
+  enemyInterval: 40, //敌机出现初始间隔/帧
+  AIInterval: 500, //智能敌机出现初始间隔/帧
   bulletInterval: 8, // 子弹发射间隔/帧
   firepowerTime: 2e4, // 火力全开持续时间/ms
   showBossScore: 1e5, //出现boss的初始分数
