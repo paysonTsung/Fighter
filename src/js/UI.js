@@ -84,14 +84,13 @@ export default class UI {
   // }
 
   drawLoading(callback){ //绘制加载动画
-    // console.log(this.globalSrcBuffer.srcBuffer);
     let loadImgArr = config.loadImageSrc;
     let loadImgLen = loadImgArr.length;
     let index = 0;
     let loadText = lanStrategy[this.language].loading;
     this.ctx.fillStyle = 'black';
     this.ctx.font = '30px sans-serif';
-    let textWidth = this.ctx.measureText(loadText).width; 
+    let textWidth = this.ctx.measureText(loadText).width;
     let textPosX = (config.canvasWidth - textWidth) / 2;
 
     let loadTimer = setInterval(() => {

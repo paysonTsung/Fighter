@@ -1,6 +1,5 @@
 /***** 默认配置文件 *****/
 export let config = {
-  bulletSpeed: 14,
   language: 'chinese', //默认语言
   imgPath: './src/img/', //图片资源路径
   soundPath: './src/sound/', //音效资源路径
@@ -10,6 +9,7 @@ export let config = {
   playerHeight: 122,
   bulletWidth: 9,
   bulletHeight: 21,
+  bulletSpeed: 14,
   smallPlaneWidth: 59,
   smallPlaneHeight: 31,
   smallPlaneSpeed: 4,

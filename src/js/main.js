@@ -1,3 +1,10 @@
+/*
+ * Author: payen S.Tsung 丛培森
+ * QQ: 1056843325
+ * Blog: http://blog.csdn.net/q1056843325
+ * Github: https://github.com/paysonTsung?tab=repositories
+ */
+
 import {config} from './Config';
 import {getID, getClass} from './Utils';
 import Source from './Source';

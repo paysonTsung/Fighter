@@ -33,9 +33,6 @@ export default class Source {
   }
 
   soundPlay(src, config = {loop: false, replay: true}){ //播放音乐/音效
-    if(src === 'music.mp3'){
-      // console.log('play');
-    }
     let sound = this.getSrc(src, 'sound');
     if(typeof config.loop === 'undefined'){
       config.loop = false;
@@ -54,9 +51,6 @@ export default class Source {
   }
 
   soundPause(src){ //暂停音乐
-    if(src === 'music.mp3'){
-      // console.log('pause');
-    }
     let sound = this.getSrc(src, 'sound');
     sound.pause();
     return sound;
